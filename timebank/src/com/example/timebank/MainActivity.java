@@ -1,5 +1,8 @@
 package com.example.timebank;
 
+import com.parse.Parse;
+import com.parse.ParseObject;
+
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +15,12 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        Parse.initialize(this, "aGRzy0mD7CnzhIrseg4wWFpS2LjX2wyIXX0yh5Yu", "PMNgqCNC17R5XHYxK5wo2ENOeUsimtox4JcD40d5");
+        
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("foo", "bar");
+        testObject.saveInBackground();
     }
 
 

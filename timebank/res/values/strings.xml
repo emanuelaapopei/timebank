@@ -4,6 +4,8 @@
     <string name="app_name">TimeBank</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="skip_login">Continue as a guest</string>
+    <string name="settings">Settings</string>
     <string name="facebook_app_id">525170010952834</string>
 
 </resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="thememain_color">#9ACD32</color>
+    <color name="disabled_button_color">#FFB7B7B7</color>
+</resources>

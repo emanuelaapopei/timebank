@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:facebook="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@drawable/mentingaz"
+	android:orientation="vertical">
+	
+	<RelativeLayout 
+		android:layout_width="match_parent"
+		android:layout_height="60dp"
+		android:background="@color/thememain_color">
+		
+		<ImageView
+			android:id="@+id/image_title"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="16dp"
+			android:layout_centerInParent="true"
+			android:scaleType="fitCenter"
+			android:src="@drawable/title_bar_logo"/>
+		
+        <com.facebook.widget.ProfilePictureView
+            android:id="@+id/selection_profile_pic"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="right|center_vertical"
+            android:layout_margin="10dp"
+            facebook:preset_size="small" />
+        
+	</RelativeLayout>
+	<ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fillViewport="true"
+        android:background="#FFF">
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:orientation="vertical">
+	
+	        <com.example.timebank.FullListView
+	            android:id="@+id/selection_list"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_margin="20dp"
+	            android:dividerHeight="@dimen/item_list_padding"
+	            android:divider="#00000000"/>
+	
+	        <ImageView 
+	            android:id="@+id/selected_image"
+	            android:layout_width="match_parent"
+	            android:layout_height="0dp"
+	            android:layout_weight="1"
+	            android:layout_marginLeft="50dp"
+	            android:layout_marginRight="50dp"/>
+	        
+	         <Button
+     			android:id="@+id/test_button"
+    			android:layout_width="wrap_content"
+    			android:layout_height="wrap_content"
+     			android:text="@string/label_for_testbutton"/>
+	      
+	    </LinearLayout>
+    </ScrollView>
+</LinearLayout>
+
+

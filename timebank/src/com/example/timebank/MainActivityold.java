@@ -1,5 +1,15 @@
 package com.example.timebank;
 
+//import com.parse.Parse;
+//import com.parse.ParseObject;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+//import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
+import com.facebook.AppEventsLogger;
+import com.parse.Parse;
+import com.parse.ParseObject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,7 +23,7 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivityold extends FragmentActivity {
 
     private static final String USER_SKIPPED_LOGIN_KEY = "user_skipped_login";
 
@@ -47,7 +57,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.main);
 
         FragmentManager fm = getSupportFragmentManager();
-        SplashFragment splashFragment = (SplashFragment) fm.findFragmentById(R.id.splashFragment);
+        SplashFragmentold splashFragment = (SplashFragmentold) fm.findFragmentById(R.id.splashFragment);
         fragments[SPLASH] = splashFragment;
         fragments[SELECTION] = fm.findFragmentById(R.id.selectionFragment);
         fragments[SETTINGS] = fm.findFragmentById(R.id.userSettingsFragment);
@@ -57,7 +67,14 @@ public class MainActivity extends FragmentActivity {
             transaction.hide(fragments[i]);
         }
         transaction.commit();
-       
+
+        splashFragment.setSkipLoginCallback(new SplashFragmentold.SkipLoginCallback() {
+            @Override
+            public void onSkipLoginPressed() {
+                userSkippedLogin = true;
+                showFragment(SELECTION, false);
+            }
+        });
     }
 
     @Override

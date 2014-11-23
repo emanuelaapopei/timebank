@@ -30,13 +30,5 @@
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/app_id"/>
         <provider android:authorities="com.facebook.app.NativeAppCallContentProvider233936543368280"
                   android:name="com.facebook.NativeAppCallContentProvider" />
-        <activity
-            android:name=".AlertActivity"
-            android:label="@string/title_activity_alert" >
-        </activity>
-        <activity
-            android:name=".SkillBoardActivity"
-            android:label="@string/title_activity_skill_board" >
-        </activity>
     </application>
 </manifest> 

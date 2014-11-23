@@ -626,6 +626,26 @@ public class SelectionFragment extends Fragment {
         intent.setClass(getActivity(), PickerActivity.class);
         startActivityForResult(intent, requestCode);
     }
+    
+    private void startAlertActivity(int requestCode) {
+        Intent intent = new Intent();
+        
+        String userId = profilePictureView.getProfileId();
+        Uri data = Uri.parse(userId);
+        intent.setData(data);
+        intent.setClass(getActivity(), AlertActivity.class);
+        startActivity(intent);
+    }
+    
+    private void startSkillBoardActivity(int requestCode) {
+        Intent intent = new Intent();
+        
+        String userId = profilePictureView.getProfileId();
+        Uri data = Uri.parse(userId);
+        intent.setData(data);
+        intent.setClass(getActivity(), SkillBoardActivity.class);
+        startActivity(intent);
+    }
 
     /**
      * Interface representing the Meal Open Graph object.
@@ -800,7 +820,8 @@ public class SelectionFragment extends Fragment {
                 public void onClick(View view) {
                     if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
-                        startPickerActivity(PickerActivity.FRIEND_PICKER, getRequestCode());
+                        //startPickerActivity(PickerActivity.FRIEND_PICKER, getRequestCode());
+                    	startAlertActivity(getRequestCode());
                     } else {
                         activity.showSettingsFragment();
                     }
@@ -923,7 +944,8 @@ public class SelectionFragment extends Fragment {
                 public void onClick(View view) {
                     if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
-                        startPickerActivity(PickerActivity.PLACE_PICKER, getRequestCode());
+                        //startPickerActivity(PickerActivity.PLACE_PICKER, getRequestCode());
+                    	startSkillBoardActivity(getRequestCode());
                     } else {
                         activity.showSettingsFragment();
                     }

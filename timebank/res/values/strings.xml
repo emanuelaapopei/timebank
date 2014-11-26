@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">timeBank</string>
     <string name="app_id">233936543368280</string>
     <string name="get_started">To get started, login using Facebook</string>
-    
     <string name="action_skill">Add Skill</string>
     <string name="action_messages">Inbox</string>
     <string name="action_people">Log session</string>
@@ -42,6 +42,11 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="label_for_testbutton">Button free of use</string>
+    
+    <!--Alert strings-->
+    <string name="alert">Alert</string>
+    <string name="alert_default">Edit alert</string>
+    <string name="add_alert">Create new alert</string>
 
     <string-array name="skill_types">
         <item>Educative</item>
@@ -53,19 +58,31 @@
         <item>Recreationale</item>
         <item>Diverse</item>
         <item>Diverse2</item>
-        <!--<item>&lt;Altele&gt;</item>-->
+        <!-- <item>&lt;Altele&gt;</item> -->
     </string-array>
-
     <string-array name="food_og_urls">
-        <item>http://samples.ogp.me/314483151980285</item> <!-- Cheeseburger -->
-        <item>http://samples.ogp.me/314483221980278</item> <!-- Pizza -->
-        <item>http://samples.ogp.me/314483265313607</item> <!-- Hotdog -->
-        <item>http://samples.ogp.me/314483348646932</item> <!-- Italian -->
-        <item>http://samples.ogp.me/314483375313596</item> <!-- French -->
-        <item>http://samples.ogp.me/314483421980258</item> <!-- Chinese -->
-        <item>http://samples.ogp.me/314483451980255</item> <!-- Thai -->
-        <item>http://samples.ogp.me/314483491980251</item> <!-- Indian -->
+        <item>http://samples.ogp.me/314483151980285</item>
+        <!-- Cheeseburger -->
+        <item>http://samples.ogp.me/314483221980278</item>
+        <!-- Pizza -->
+        <item>http://samples.ogp.me/314483265313607</item>
+        <!-- Hotdog -->
+        <item>http://samples.ogp.me/314483348646932</item>
+        <!-- Italian -->
+        <item>http://samples.ogp.me/314483375313596</item>
+        <!-- French -->
+        <item>http://samples.ogp.me/314483421980258</item>
+        <!-- Chinese -->
+        <item>http://samples.ogp.me/314483451980255</item>
+        <!-- Thai -->
+        <item>http://samples.ogp.me/314483491980251</item>
+        <!-- Indian -->
         <item></item>
     </string-array>
-    
+
+    <string name="title_activity_alert">AlertActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_skill_board">SkillBoardActivity</string>
+
 </resources>

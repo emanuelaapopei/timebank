@@ -3,19 +3,12 @@
 
     <string name="app_name">timeBank</string>
     <string name="app_id">233936543368280</string>
-    
     <string name="facebook_app_id">1554786971405181</string>
-    
     <string name="get_started">To get started, login using Facebook</string>
-    
     <string name="action_skill">Skill Board</string>
-    
     <string name="action_messages">Inbox</string>
-    
     <string name="action_people">Sessions</string>
-    
     <string name="action_alert">Alerts</string>
-    
     <string name="action_eating_default">Select a meal</string>
     <string name="action_people_default">Select friends</string>
     <string name="action_photo_default">Take one</string>
@@ -50,19 +43,37 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="label_for_testbutton">Button free of use</string>
-    
-    <!--Alert strings-->
+
+    <!-- Alert strings -->
     <string name="alert">Alert</string>
     <string name="alert_default">Edit alert</string>
     <string name="add_alert">Create new alert</string>
-    <string name="skill_input">Skill</string>
-    <string name="user_input">User</string>
-    
-    <!--Skill Board strings-->
+   
+    <!-- Skill Board strings -->
     <string name="skill">Skill</string>
     <string name="skill_default">Edit skill</string>
     <string name="add_skill">Add new skill</string>
-
+    
+    <!-- Session strings -->
+    <string name="session">Session</string>
+    <string name="session_default">Edit session</string>
+    <string name="add_session">Create new session</string>
+    
+    <!-- Dialog strings -->
+    <string name="skill_input">Skill</string>
+    <string name="user_input">User</string>
+    <string name="experience_input">Level of experience</string>
+    <string name="hours_input">Hours</string>
+    
+    <!-- Dialog string arrays -->
+    
+    <string-array name="experience_level">
+        <item>Basic</item>
+        <item>Medium</item>
+        <item>Advanced</item>
+        <item>Expert</item>
+    </string-array>
+    
     <string-array name="skill_types">
         <item>Educative</item>
         <item>Artistice</item>
@@ -99,5 +110,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_skill_board">SkillBoardActivity</string>
+    <string name="title_activity_session">SessionActivity</string>
 
 </resources>

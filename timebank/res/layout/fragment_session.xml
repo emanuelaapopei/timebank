@@ -37,36 +37,27 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:fillViewport="true"
-        android:background="@drawable/mentingaz">
+        android:background="#FFF">
 	    <LinearLayout
 	        android:layout_width="fill_parent"
 	        android:layout_height="fill_parent"
 	        android:orientation="vertical">
 	
 	        <com.example.timebank.FullListView
-	            android:id="@+id/selection_list"
+	            android:id="@+id/session_list"
 	            android:layout_width="fill_parent"
 	            android:layout_height="wrap_content"
 	            android:layout_margin="20dp"
 	            android:dividerHeight="@dimen/item_list_padding"
 	            android:divider="#00000000"/>
-	
-	        <ImageView 
-	            android:id="@+id/selected_image"
-	            android:layout_width="match_parent"
-	            android:layout_height="0dp"
-	            android:layout_weight="1"
-	            android:layout_marginLeft="50dp"
-	            android:layout_marginRight="50dp"/>
 	        
-	         <Button
-     			android:id="@+id/test_button"
+	        <Button
+	            android:id="@+id/test_button"
     			android:layout_width="wrap_content"
     			android:layout_height="wrap_content"
-     			android:text="@string/label_for_testbutton"/>
-	      
+     			android:text="@string/add_session"/>
+		      
 	    </LinearLayout>
     </ScrollView>
 </LinearLayout>
-
 

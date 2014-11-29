@@ -21,7 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-public class SkillBoardFragment extends Fragment {
+public class SessionFragment extends Fragment {
 	
 	private ProfilePictureView profilePictureView;
 	private String userId;
@@ -29,42 +29,42 @@ public class SkillBoardFragment extends Fragment {
 	private ListView listView;
 	private List<BaseListElement> listElements;
 	
-	private Button addSkill; 
+	private Button addSession; 
 
-	public SkillBoardFragment(String UserId) {
+	public SessionFragment(String UserId) {
 		userId = UserId;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_skill_board,
+		View view = inflater.inflate(R.layout.fragment_session,
 				container, false);
 		
 		profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
 		profilePictureView.setProfileId(userId);
 		
-		addSkill = (Button) view.findViewById(R.id.test_button); 
-		addSkill.setOnClickListener(new View.OnClickListener() {
+		addSession = (Button) view.findViewById(R.id.test_button); 
+		addSession.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	addNewSkill();
+            	addNewSession();
             }
         }); 
 		
 		// Find the list view
-		listView = (ListView) view.findViewById(R.id.skill_list);
+		listView = (ListView) view.findViewById(R.id.session_list);
 
 		// Set up the list view items, based on a list of
 		// BaseListElement items
 		listElements = new ArrayList<BaseListElement>();
 		// Add an item for the friend picker
-		listElements.add(new SkillListElement(0));
-		listElements.add(new SkillListElement(1));
-		listElements.add(new SkillListElement(2));
-		listElements.add(new SkillListElement(3));
+		listElements.add(new SessionListElement(0));
+		listElements.add(new SessionListElement(1));
+		listElements.add(new SessionListElement(2));
+		listElements.add(new SessionListElement(3));
 		// Set the list view adapter
 		listView.setAdapter(new ActionListAdapter(getActivity(), 
-		                    R.id.skill_list, listElements));
+		                    R.id.session_list, listElements));
 		init(savedInstanceState);
 		return view;
 	}
@@ -97,10 +97,10 @@ public class SkillBoardFragment extends Fragment {
         super.onDestroy();
     }
     
-    public void addNewSkill()
+    public void addNewSession()
     {
-    	DialogFragment newFragment = new AddSkillDialog();
-        newFragment.show(getFragmentManager(), "skill");
+    	DialogFragment newFragment = new AddSessionDialog();
+        newFragment.show(getFragmentManager(), "session");
     }
     
     /**
@@ -155,12 +155,12 @@ public class SkillBoardFragment extends Fragment {
 
 	}
 	
-	private class SkillListElement extends BaseListElement {
+	private class SessionListElement extends BaseListElement {
 
-	    public SkillListElement(int requestCode) {
-	        super(getActivity().getResources().getDrawable(R.drawable.add_skill),
-	              getActivity().getResources().getString(R.string.skill),
-	              getActivity().getResources().getString(R.string.skill_default),
+	    public SessionListElement(int requestCode) {
+	        super(getActivity().getResources().getDrawable(R.drawable.add_session),
+	              getActivity().getResources().getString(R.string.session),
+	              getActivity().getResources().getString(R.string.session_default),
 	              requestCode);
 	    }
 

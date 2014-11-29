@@ -646,6 +646,16 @@ public class SelectionFragment extends Fragment {
         intent.setClass(getActivity(), SkillBoardActivity.class);
         startActivity(intent);
     }
+    
+    private void startSessionActivity(int requestCode) {
+        Intent intent = new Intent();
+        
+        String userId = profilePictureView.getProfileId();
+        Uri data = Uri.parse(userId);
+        intent.setData(data);
+        intent.setClass(getActivity(), SessionActivity.class);
+        startActivity(intent);
+    }
 
     /**
      * Interface representing the Meal Open Graph object.
@@ -826,7 +836,8 @@ public class SelectionFragment extends Fragment {
                 public void onClick(View view) {
                     if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
-                        startPickerActivity(PickerActivity.FRIEND_PICKER, getRequestCode());
+                        //startPickerActivity(PickerActivity.FRIEND_PICKER, getRequestCode());
+                    	startSessionActivity(getRequestCode());
                     } else {
                         activity.showSettingsFragment();
                     }

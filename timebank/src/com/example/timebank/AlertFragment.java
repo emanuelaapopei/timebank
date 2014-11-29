@@ -9,11 +9,13 @@ import com.facebook.widget.ProfilePictureView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ public class AlertFragment extends Fragment {
 	
 	private ProfilePictureView profilePictureView;
 	private String userId;
+	private Button addAlert; 
 	
 	private ListView listView;
 	private List<BaseListElement> listElements;
@@ -39,6 +42,13 @@ public class AlertFragment extends Fragment {
 		
 		profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
 		profilePictureView.setProfileId(userId);
+		
+		addAlert = (Button) view.findViewById(R.id.test_butto); 
+		addAlert.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	addNewAlert();
+            }
+        }); 
 		
 		// Find the list view
 		listView = (ListView) view.findViewById(R.id.alert_list);
@@ -85,12 +95,19 @@ public class AlertFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
     }
+    
+    public void addNewAlert()
+    {
+    	DialogFragment newFragment = new AddAlertDialog();
+        newFragment.show(getFragmentManager(), "alert");
+    }
     /**
      * Resets the view to the initial defaults.
      */
     private void init(Bundle savedInstanceState) {
     	
     }
+    
 	
 	private class ActionListAdapter extends ArrayAdapter<BaseListElement> {
 	    private List<BaseListElement> listElements;
@@ -141,8 +158,8 @@ public class AlertFragment extends Fragment {
 
 	    public AlertListElement(int requestCode) {
 	        super(getActivity().getResources().getDrawable(R.drawable.add_alert),
-	              getActivity().getResources().getString(R.string.action_people),
-	              getActivity().getResources().getString(R.string.action_people_default),
+	              getActivity().getResources().getString(R.string.alert),
+	              getActivity().getResources().getString(R.string.alert_default),
 	              requestCode);
 	    }
 

@@ -140,9 +140,9 @@ public class SkillBoardFragment extends Fragment {
 	private class SkillListElement extends BaseListElement {
 
 	    public SkillListElement(int requestCode) {
-	        super(getActivity().getResources().getDrawable(R.drawable.add_alert),
-	              getActivity().getResources().getString(R.string.action_people),
-	              getActivity().getResources().getString(R.string.action_people_default),
+	        super(getActivity().getResources().getDrawable(R.drawable.add_skill),
+	              getActivity().getResources().getString(R.string.skill),
+	              getActivity().getResources().getString(R.string.skill_default),
 	              requestCode);
 	    }
 

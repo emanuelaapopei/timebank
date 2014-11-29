@@ -32,11 +32,11 @@
                   android:name="com.facebook.NativeAppCallContentProvider" />
         <activity
             android:name=".AlertActivity"
-            android:label="@string/title_activity_alert" >
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name=".SkillBoardActivity"
-            android:label="@string/title_activity_skill_board" >
+            android:label="@string/app_name" >
         </activity>
     </application>
 </manifest> 

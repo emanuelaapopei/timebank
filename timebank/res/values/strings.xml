@@ -3,11 +3,19 @@
 
     <string name="app_name">timeBank</string>
     <string name="app_id">233936543368280</string>
+    
+    <string name="facebook_app_id">1554786971405181</string>
+    
     <string name="get_started">To get started, login using Facebook</string>
-    <string name="action_skill">Add Skill</string>
+    
+    <string name="action_skill">Skill Board</string>
+    
     <string name="action_messages">Inbox</string>
-    <string name="action_people">Log session</string>
-    <string name="action_alert">Add skill alert</string>
+    
+    <string name="action_people">Sessions</string>
+    
+    <string name="action_alert">Alerts</string>
+    
     <string name="action_eating_default">Select a meal</string>
     <string name="action_people_default">Select friends</string>
     <string name="action_photo_default">Take one</string>
@@ -47,6 +55,13 @@
     <string name="alert">Alert</string>
     <string name="alert_default">Edit alert</string>
     <string name="add_alert">Create new alert</string>
+    <string name="skill_input">Skill</string>
+    <string name="user_input">User</string>
+    
+    <!--Skill Board strings-->
+    <string name="skill">Skill</string>
+    <string name="skill_default">Edit skill</string>
+    <string name="add_skill">Add new skill</string>
 
     <string-array name="skill_types">
         <item>Educative</item>

@@ -697,7 +697,13 @@ public class SelectionFragment extends Fragment {
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showMealOptions();
+                    //showMealOptions();
+                	if (Session.getActiveSession() != null &&
+                            Session.getActiveSession().isOpened()) {
+                    	startSkillBoardActivity(getRequestCode());
+                    } else {
+                        activity.showSettingsFragment();
+                    }
                 }
             };
         }
@@ -820,8 +826,7 @@ public class SelectionFragment extends Fragment {
                 public void onClick(View view) {
                     if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
-                        //startPickerActivity(PickerActivity.FRIEND_PICKER, getRequestCode());
-                    	startAlertActivity(getRequestCode());
+                        startPickerActivity(PickerActivity.FRIEND_PICKER, getRequestCode());
                     } else {
                         activity.showSettingsFragment();
                     }
@@ -1026,7 +1031,14 @@ public class SelectionFragment extends Fragment {
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showPhotoChoice();
+                    //showPhotoChoice();
+                	if (Session.getActiveSession() != null &&
+                            Session.getActiveSession().isOpened()) {
+                        //startPickerActivity(PickerActivity.PLACE_PICKER, getRequestCode());
+                    	startAlertActivity(getRequestCode());
+                    } else {
+                        activity.showSettingsFragment();
+                    }
                 }
             };
         }

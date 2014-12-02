@@ -12,6 +12,8 @@ import com.facebook.AppEventsLogger;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
+//import com.parse.Parse;
+//import com.parse.ParseObject;
 
 public class MainActivity extends FragmentActivity {
 
@@ -57,6 +59,14 @@ public class MainActivity extends FragmentActivity {
             transaction.hide(fragments[i]);
         }
         transaction.commit();
+
+//        splashFragment.setSkipLoginCallback(new SplashFragment.SkipLoginCallback() {
+//            @Override
+//            public void onSkipLoginPressed() {
+//                userSkippedLogin = true;
+//                showFragment(SELECTION, false);
+//            }
+//        });
        
     }
 

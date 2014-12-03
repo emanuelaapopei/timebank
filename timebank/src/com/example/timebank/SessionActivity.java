@@ -1,29 +1,36 @@
 package com.example.timebank;
 
 
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.os.Build;
 
 import com.example.timebank.SessionFragment;
 
-public class SessionActivity extends FragmentActivity {
+public class SessionActivity extends FragmentActivity
+							 implements AddSessionDialog.AddSessionListener{
 	
 	private SessionFragment sessionFragment;
-
+	private static final String TAG = "timeBank";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_session);
+		
+		//Log.d(TAG, "hahahahahghghkj");
 		
 		Uri intentUri = getIntent().getData();
 		String userId = intentUri.toString();
@@ -81,6 +88,20 @@ public class SessionActivity extends FragmentActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	// The dialog fragment receives a reference to this Activity through the
+    // Fragment.onAttach() callback, which it uses to call the following methods
+    // defined by the NoticeDialogFragment.NoticeDialogListener interface
+	@Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+      //Log.d(TAG, "hahahahah");
+    }
+
+	@Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+        
+    }
 
 	
 }

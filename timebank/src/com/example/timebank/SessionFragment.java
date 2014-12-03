@@ -109,7 +109,7 @@ public class SessionFragment extends Fragment {
     private void init(Bundle savedInstanceState) {
     	
     }
-	
+    	
 	private class ActionListAdapter extends ArrayAdapter<BaseListElement> {
 	    private List<BaseListElement> listElements;
 

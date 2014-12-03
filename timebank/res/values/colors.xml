@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="thememain_color">#9ACD32</color>
+    <color name="thememain_color">#9ACD32</color>
     <color name="disabled_button_color">#FFB7B7B7</color>
     <color name="add_alert_color">#F2C513</color>
 </resources>

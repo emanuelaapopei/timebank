@@ -33,11 +33,10 @@ public class FullListView extends ListView {
         int count = adapter.getCount();
         for (int i = 0; i < count; i++) {
             View childView = adapter.getView(i, null, this);
-            childView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
-                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+            childView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             height += childView.getMeasuredHeight();
         }
-        height += getDividerHeight() * (count-1);
+        height += getDividerHeight() * (count - 1);
         setMeasuredDimension(width, height);
     }
 }

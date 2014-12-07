@@ -1,18 +1,3 @@
-/**
- * Copyright 2010-present Facebook.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package com.example.timebank;
 
@@ -24,7 +9,7 @@ import android.widget.BaseAdapter;
 import com.facebook.model.OpenGraphAction;
 
 /**
- * Base class for a list element in the Scrumptious main display, consisting of an
+ * Base class for a list element in the  main display, consisting of an
  * icon to the left, and a two line display to the right.
  */
 public abstract class BaseListElement {
@@ -38,9 +23,9 @@ public abstract class BaseListElement {
     /**
      * Constructs a new list element.
      *
-     * @param icon the drawable for the icon
-     * @param text1 the first row of text
-     * @param text2 the second row of text
+     * @param icon        the drawable for the icon
+     * @param text1       the first row of text
+     * @param text2       the second row of text
      * @param requestCode the requestCode to start new Activities with
      */
     public BaseListElement(Drawable icon, String text1, String text2, int requestCode) {
@@ -53,6 +38,7 @@ public abstract class BaseListElement {
     /**
      * The Adapter associated with this list element (used for notifying that the
      * underlying dataset has changed).
+     *
      * @param adapter the adapter associated with this element
      */
     public void setAdapter(BaseAdapter adapter) {
@@ -139,14 +125,16 @@ public abstract class BaseListElement {
      *
      * @param data the data associated with the result
      */
-    protected void onActivityResult(Intent data) {}
+    protected void onActivityResult(Intent data) {
+    }
 
     /**
      * Save the state of the current element.
      *
      * @param bundle the bundle to save to
      */
-    protected void onSaveInstanceState(Bundle bundle) {}
+    protected void onSaveInstanceState(Bundle bundle) {
+    }
 
     /**
      * Restore the state from the saved bundle. Returns true if the

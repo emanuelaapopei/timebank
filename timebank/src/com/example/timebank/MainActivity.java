@@ -31,9 +31,9 @@ public class MainActivity extends FragmentActivity {
     private static final String USER_SKIPPED_LOGIN_KEY = "user_skipped_login";
 
     private static final int SPLASH = 0;
-    private static final int SELECTION = 1;
+    private static final int HOMESCREEN = 1;
     private static final int SETTINGS = 2;
-    private static final int FRAGMENT_COUNT = SETTINGS +1;
+    private static final int FRAGMENT_COUNT = SETTINGS + 1;
 
     private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
     private MenuItem settings;
@@ -50,37 +50,35 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         Parse.initialize(this, "aGRzy0mD7CnzhIrseg4wWFpS2LjX2wyIXX0yh5Yu", "PMNgqCNC17R5XHYxK5wo2ENOeUsimtox4JcD40d5");
-        
         if (savedInstanceState != null) {
             userSkippedLogin = savedInstanceState.getBoolean(USER_SKIPPED_LOGIN_KEY);
         }
         uiHelper = new UiLifecycleHelper(this, callback);
         uiHelper.onCreate(savedInstanceState);
 
-        setContentView(R.layout.main);
+        setContentView(R.layout.main_activity);
 
         FragmentManager fm = getSupportFragmentManager();
         SplashFragment splashFragment = (SplashFragment) fm.findFragmentById(R.id.splashFragment);
         fragments[SPLASH] = splashFragment;
-        fragments[SELECTION] = fm.findFragmentById(R.id.selectionFragment);
+        fragments[HOMESCREEN] = fm.findFragmentById(R.id.homeScreenFragment);
         fragments[SETTINGS] = fm.findFragmentById(R.id.userSettingsFragment);
 
         FragmentTransaction transaction = fm.beginTransaction();
-        for(int i = 0; i < fragments.length; i++) {
+        for (int i = 0; i < fragments.length; i++) {
             transaction.hide(fragments[i]);
         }
         transaction.commit();
-       
+
 //        splashFragment.setSkipLoginCallback(new SplashFragment.SkipLoginCallback() {
 //            @Override
 //            public void onSkipLoginPressed() {
 //                userSkippedLogin = true;
-//                showFragment(SELECTION, false);
+//                showFragment(HOMESCREEN, false);
 //            }
 //        });
-       
     }
 
     @Override
@@ -132,10 +130,10 @@ public class MainActivity extends FragmentActivity {
 
         if (session != null && session.isOpened()) {
             // if the session is already open, try to show the selection fragment
-            showFragment(SELECTION, false);
+            showFragment(HOMESCREEN, false);
             userSkippedLogin = false;
         } else if (userSkippedLogin) {
-            showFragment(SELECTION, false);
+            showFragment(HOMESCREEN, false);
         } else {
             // otherwise present the splash screen and ask the user to login, unless the user explicitly skipped.
             showFragment(SPLASH, false);
@@ -145,7 +143,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // only add the menu when the selection fragment is showing
-        if (fragments[SELECTION].isVisible()) {
+        if (fragments[HOMESCREEN].isVisible()) {
             if (menu.size() == 0) {
                 settings = menu.add(R.string.settings);
             }
@@ -180,8 +178,9 @@ public class MainActivity extends FragmentActivity {
             // check for the OPENED state instead of session.isOpened() since for the
             // OPENED_TOKEN_UPDATED state, the selection fragment should already be showing.
             if (state.equals(SessionState.OPENED)) {
-                showFragment(SELECTION, false);
+                showFragment(HOMESCREEN, false);
             } else if (state.isClosed()) {
+                Toast.makeText(this, "Check Internet connection!", 100).show();
                 showFragment(SPLASH, false);
             }
         }

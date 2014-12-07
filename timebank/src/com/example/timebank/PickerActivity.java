@@ -1,19 +1,3 @@
-/**
- * Copyright 2010-present Facebook.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.timebank;
 
 import android.app.AlertDialog;
@@ -51,8 +35,8 @@ public class PickerActivity extends FragmentActivity {
     private static final int LOCATION_CHANGE_THRESHOLD = 50; // meters
 
     private static final Location SAN_FRANCISCO_LOCATION = new Location("") {{
-            setLatitude(37.7750);
-            setLongitude(-122.4183);
+        setLatitude(37.7750);
+        setLongitude(-122.4183);
     }};
 
     private FriendPickerFragment friendPickerFragment;
@@ -74,7 +58,8 @@ public class PickerActivity extends FragmentActivity {
                 friendPickerFragment = new FriendPickerFragment(args);
                 friendPickerFragment.setFriendPickerType(FriendPickerFragment.FriendPickerType.TAGGABLE_FRIENDS);
             } else {
-                friendPickerFragment = (FriendPickerFragment) manager.findFragmentById(R.id.picker_fragment);;
+                friendPickerFragment = (FriendPickerFragment) manager.findFragmentById(R.id.picker_fragment);
+                ;
             }
 
             friendPickerFragment.setOnErrorListener(new PickerFragment.OnErrorListener() {
@@ -157,12 +142,15 @@ public class PickerActivity extends FragmentActivity {
                                     placePickerFragment.loadData(true);
                                 }
                             }
+
                             @Override
                             public void onStatusChanged(String s, int i, Bundle bundle) {
                             }
+
                             @Override
                             public void onProviderEnabled(String s) {
                             }
+
                             @Override
                             public void onProviderDisabled(String s) {
                             }
@@ -225,7 +213,7 @@ public class PickerActivity extends FragmentActivity {
     }
 
     private void finishActivity() {
-        ScrumptiousApplication app = (ScrumptiousApplication) getApplication();
+        TimeBankApplication app = (TimeBankApplication) getApplication();
         if (FRIEND_PICKER.equals(getIntent().getData())) {
             if (friendPickerFragment != null) {
                 app.setSelectedUsers(friendPickerFragment.getSelection());

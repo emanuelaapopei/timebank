@@ -16,7 +16,10 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Pair;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -35,16 +38,14 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Fragment that represents the main selection screen for Scrumptious.
+ * Fragment that represents the main home screen for Time Bank.
  */
-public class SelectionFragment extends Fragment {
+public class HomeScreenFragment extends Fragment implements OnGestureListener {
 
-    private static final String TAG = "SelectionFragment";
+    private static final String TAG = "HomeScreenFragment";
     private static final String MEAL_OBJECT_TYPE = "fb_sample_scrumps:meal";
     private static final String EAT_ACTION_TYPE = "fb_sample_scrumps:eat";
-    private static final String DEFAULT_ACTION_IMAGE_URL =
-            "http://facebooksampleapp.com/scrumptious/static/images/logo.png";
-
+    private static final String DEFAULT_ACTION_IMAGE_URL = "http://facebooksampleapp.com/scrumptious/static/images/logo.png";
     private static final String PENDING_ANNOUNCE_KEY = "pendingAnnounce";
     private static final Uri M_FACEBOOK_URL = Uri.parse("http://m.facebook.com");
     private static final int USER_GENERATED_MIN_SIZE = 480;
@@ -52,7 +53,8 @@ public class SelectionFragment extends Fragment {
     private static final int REAUTH_ACTIVITY_CODE = 100;
     private static final String PERMISSION = "publish_actions";
 
-    private TextView testButton;
+    GestureDetector detector;
+    private Button testButton;
     private ListView listView;
     private ProgressDialog progressDialog;
     private List<BaseListElement> listElements;
@@ -74,8 +76,7 @@ public class SelectionFragment extends Fragment {
         public void onComplete(FacebookDialog.PendingCall pendingCall, Bundle data) {
             boolean resetSelections = true;
             if (FacebookDialog.getNativeDialogDidComplete(data)) {
-                if (FacebookDialog.COMPLETION_GESTURE_CANCEL
-                        .equals(FacebookDialog.getNativeDialogCompletionGesture(data))) {
+                if (FacebookDialog.COMPLETION_GESTURE_CANCEL.equals(FacebookDialog.getNativeDialogCompletionGesture(data))) {
                     // Leave selections alone if user canceled.
                     resetSelections = false;
                     showCancelResponse();
@@ -103,8 +104,10 @@ public class SelectionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = (MainActivity) getActivity();
+        detector = new GestureDetector(this);
         uiHelper = new UiLifecycleHelper(getActivity(), sessionCallback);
         uiHelper.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -116,27 +119,44 @@ public class SelectionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.selection, container, false);
+        View view = inflater.inflate(R.layout.homescreen, container, false);
+
+        view.setOnTouchListener(new OnSwipeTouchListener(activity) {
+            @Override
+            public void onSwipeRight() {
+                Toast.makeText(activity.getApplicationContext(), "User Board", 100).show();
+                listView.setVisibility(View.VISIBLE);
+                WindowManager.LayoutParams windowAttr = activity.getWindow().getAttributes();
+                windowAttr.dimAmount = 1.0f;
+                activity.getWindow().setAttributes(windowAttr);                
+                
+       /*         listView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        listView.setVisibility(View.INVISIBLE);
+                    }
+                }, 3000);*/
+            }
+
+            @Override
+            public void onSwipeLeft() {
+                Toast.makeText(activity.getApplicationContext(), "Close board", 100).show();
+                listView.setVisibility(View.INVISIBLE);
+            }
+        });
 
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
-        //profilePictureView.setCropped(true);
-        testButton = (TextView) view.findViewById(R.id.test_button);
+        profilePictureView.setCropped(true);
+        testButton = (Button) view.findViewById(R.id.test_button);
         listView = (ListView) view.findViewById(R.id.selection_list);
-        photoThumbnail = (ImageView) view.findViewById(R.id.selected_image);
+        listView.setVisibility(View.INVISIBLE);
 
+        photoThumbnail = (ImageView) view.findViewById(R.id.selected_image);
 //        if (FacebookDialog.canPresentOpenGraphMessageDialog(activity)) {
 //            messageButton.setVisibility(View.VISIBLE);
 //        }
 
-        testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleAnnounce(false);
-            }
-        });
-       
         init(savedInstanceState);
-
         return view;
     }
 
@@ -216,10 +236,9 @@ public class SelectionFragment extends Fragment {
      * Resets the view to the initial defaults.
      */
     private void init(Bundle savedInstanceState) {
-        testButton.setEnabled(false);
-  
-        listElements = new ArrayList<BaseListElement>();
+//        testButton.setEnabled(false);
 
+        listElements = new ArrayList<BaseListElement>();
         listElements.add(new SkillListElement(0));
         listElements.add(new LocationListElement(1));
         listElements.add(new PeopleListElement(2));
@@ -268,8 +287,7 @@ public class SelectionFragment extends Fragment {
         }
 
         // Show a progress dialog because sometimes the requests can take a while.
-        progressDialog = ProgressDialog.show(getActivity(), "",
-                getActivity().getResources().getString(R.string.progress_dialog_text), true);
+        progressDialog = ProgressDialog.show(getActivity(), "", getActivity().getResources().getString(R.string.progress_dialog_text), true);
 
         // Run this in a background thread so we can process the list of responses and extract errors.
         AsyncTask<Void, Void, List<Response>> task = new AsyncTask<Void, Void, List<Response>>() {
@@ -277,9 +295,7 @@ public class SelectionFragment extends Fragment {
             @Override
             protected List<Response> doInBackground(Void... voids) {
                 EatAction eatAction = createEatAction();
-
                 RequestBatch requestBatch = new RequestBatch();
-
                 String photoStagingUri = null;
 
                 if (photoUri != null) {
@@ -305,8 +321,7 @@ public class SelectionFragment extends Fragment {
                 }
                 MealGraphObject meal = eatAction.getMeal();
                 if (meal.getCreateObject()) {
-                    Request createObjectRequest =
-                            Request.newPostOpenGraphObjectRequest(Session.getActiveSession(), meal, null);
+                    Request createObjectRequest =  Request.newPostOpenGraphObjectRequest(Session.getActiveSession(), meal, null);
                     createObjectRequest.setBatchEntryName("createObject");
                     requestBatch.add(createObjectRequest);
                     eatAction.setProperty("meal", "{result=createObject:$.id}");
@@ -363,7 +378,7 @@ public class SelectionFragment extends Fragment {
 
         FacebookDialog.OpenGraphActionDialogBuilder builder = new FacebookDialog.OpenGraphActionDialogBuilder(
                 getActivity(), eatAction, "meal")
-                .setFragment(SelectionFragment.this);
+                .setFragment(HomeScreenFragment.this);
 
         if (photoUri != null && !photoUri.getScheme().startsWith("content")) {
             builder.setImageAttachmentFilesForAction(Arrays.asList(new File(photoUri.getPath())), userGenerated);
@@ -400,7 +415,7 @@ public class SelectionFragment extends Fragment {
 
         FacebookDialog.OpenGraphMessageDialogBuilder builder = new FacebookDialog.OpenGraphMessageDialogBuilder(
                 getActivity(), eatAction, "meal")
-                .setFragment(SelectionFragment.this);
+                .setFragment(HomeScreenFragment.this);
 
         if (photoUri != null && !photoUri.getScheme().startsWith("content")) {
             builder.setImageAttachmentFilesForAction(Arrays.asList(new File(photoUri.getPath())), userGenerated);
@@ -415,7 +430,7 @@ public class SelectionFragment extends Fragment {
         if (photoUriString.startsWith("file://")) {
             photoFile = new File(photoUri.getPath());
         } else if (photoUriString.startsWith("content://")) {
-            String [] filePath = { MediaStore.Images.Media.DATA };
+            String[] filePath = {MediaStore.Images.Media.DATA};
             Cursor cursor = getActivity().getContentResolver().query(photoUri, filePath, null, null, null);
             if (cursor != null) {
                 cursor.moveToFirst();
@@ -450,8 +465,8 @@ public class SelectionFragment extends Fragment {
     /**
      * Creates a GraphObject with the following format:
      * {
-     *     url: ${uri},
-     *     user_generated: true
+     * url: ${uri},
+     * user_generated: true
      * }
      */
     private GraphObject getImageObject(String uri, boolean userGenerated) {
@@ -543,8 +558,7 @@ public class SelectionFragment extends Fragment {
                 case AUTHENTICATION_RETRY:
                     // tell the user what happened by getting the message id, and
                     // retry the operation later
-                    String userAction = (error.shouldNotifyUser()) ? "" :
-                            getString(error.getUserActionMessageId());
+                    String userAction = (error.shouldNotifyUser()) ? "" : getString(error.getUserActionMessageId());
                     dialogBody = getString(R.string.error_authentication_retry, userAction);
                     listener = new DialogInterface.OnClickListener() {
                         @Override
@@ -626,30 +640,30 @@ public class SelectionFragment extends Fragment {
         intent.setClass(getActivity(), PickerActivity.class);
         startActivityForResult(intent, requestCode);
     }
-    
+
     private void startAlertActivity(int requestCode) {
         Intent intent = new Intent();
-        
+
         String userId = profilePictureView.getProfileId();
         Uri data = Uri.parse(userId);
         intent.setData(data);
         intent.setClass(getActivity(), AlertActivity.class);
         startActivity(intent);
     }
-    
+
     private void startSkillBoardActivity(int requestCode) {
         Intent intent = new Intent();
-        
+
         String userId = profilePictureView.getProfileId();
         Uri data = Uri.parse(userId);
         intent.setData(data);
         intent.setClass(getActivity(), SkillBoardActivity.class);
         startActivity(intent);
     }
-    
+
     private void startSessionActivity(int requestCode) {
         Intent intent = new Intent();
-        
+
         String userId = profilePictureView.getProfileId();
         Uri data = Uri.parse(userId);
         intent.setData(data);
@@ -663,7 +677,6 @@ public class SelectionFragment extends Fragment {
     private interface MealGraphObject extends OpenGraphObject {
         public String getUrl();
         public void setUrl(String url);
-
         public String getId();
         public void setId(String id);
     }
@@ -708,9 +721,9 @@ public class SelectionFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     //showMealOptions();
-                	if (Session.getActiveSession() != null &&
+                    if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
-                    	startSkillBoardActivity(getRequestCode());
+                        startSkillBoardActivity(getRequestCode());
                     } else {
                         activity.showSettingsFragment();
                     }
@@ -728,8 +741,7 @@ public class SelectionFragment extends Fragment {
                     meal.setUrl(foodChoiceUrl);
                     eatAction.setMeal(meal);
                 } else {
-                    MealGraphObject meal = OpenGraphObject.Factory.createForPost(MealGraphObject.class,
-                            MEAL_OBJECT_TYPE);
+                    MealGraphObject meal = OpenGraphObject.Factory.createForPost(MealGraphObject.class, MEAL_OBJECT_TYPE);
                     meal.setTitle(skillChoice);
                     eatAction.setMeal(meal);
                 }
@@ -808,10 +820,10 @@ public class SelectionFragment extends Fragment {
         private void setFoodText() {
             if (skillChoice != null && skillChoice.length() > 0) {
                 setText2(skillChoice);
-                testButton.setEnabled(true);                
+                testButton.setEnabled(true);
             } else {
                 setText2(getActivity().getResources().getString(R.string.action_eating_default));
-                testButton.setEnabled(false);               
+                testButton.setEnabled(false);
             }
         }
     }
@@ -837,7 +849,7 @@ public class SelectionFragment extends Fragment {
                     if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
                         //startPickerActivity(PickerActivity.FRIEND_PICKER, getRequestCode());
-                    	startSessionActivity(getRequestCode());
+                        startSessionActivity(getRequestCode());
                     } else {
                         activity.showSettingsFragment();
                     }
@@ -847,7 +859,7 @@ public class SelectionFragment extends Fragment {
 
         @Override
         protected void onActivityResult(Intent data) {
-            selectedUsers = ((ScrumptiousApplication) getActivity().getApplication()).getSelectedUsers();
+            selectedUsers = ((TimeBankApplication) getActivity().getApplication()).getSelectedUsers();
             setUsersText();
             notifyDataChanged();
         }
@@ -961,7 +973,7 @@ public class SelectionFragment extends Fragment {
                     if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
                         //startPickerActivity(PickerActivity.PLACE_PICKER, getRequestCode());
-                    	startSkillBoardActivity(getRequestCode());
+                        startSkillBoardActivity(getRequestCode());
                     } else {
                         activity.showSettingsFragment();
                     }
@@ -971,7 +983,7 @@ public class SelectionFragment extends Fragment {
 
         @Override
         protected void onActivityResult(Intent data) {
-            selectedPlace = ((ScrumptiousApplication) getActivity().getApplication()).getSelectedPlace();
+            selectedPlace = ((TimeBankApplication) getActivity().getApplication()).getSelectedPlace();
             setPlaceText();
             notifyDataChanged();
         }
@@ -1043,10 +1055,10 @@ public class SelectionFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     //showPhotoChoice();
-                	if (Session.getActiveSession() != null &&
+                    if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
                         //startPickerActivity(PickerActivity.PLACE_PICKER, getRequestCode());
-                    	startAlertActivity(getRequestCode());
+                        startAlertActivity(getRequestCode());
                     } else {
                         activity.showSettingsFragment();
                     }
@@ -1092,7 +1104,7 @@ public class SelectionFragment extends Fragment {
             CharSequence camera = getResources().getString(R.string.action_photo_camera);
             CharSequence gallery = getResources().getString(R.string.action_photo_gallery);
             builder.setCancelable(true).
-                    setItems(new CharSequence[] {camera, gallery}, new DialogInterface.OnClickListener() {
+                    setItems(new CharSequence[]{camera, gallery}, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (i == CAMERA) {
@@ -1112,7 +1124,7 @@ public class SelectionFragment extends Fragment {
                 setText2(getResources().getString(R.string.action_photo_ready));
             }
         }
-        
+
         private void setPhotoThumbnail() {
             photoThumbnail.setImageURI(photoUri);
         }
@@ -1190,5 +1202,43 @@ public class SelectionFragment extends Fragment {
             return view;
         }
 
+    }
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+                            float distanceY) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                           float velocityY) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

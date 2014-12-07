@@ -6,8 +6,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-    <fragment android:name="com.example.timebank.SelectionFragment"
-              android:id="@+id/selectionFragment"
+    <fragment android:name="com.example.timebank.HomeScreenFragment"
+              android:id="@+id/homeScreenFragment"
               android:layout_width="match_parent"
               android:layout_height="match_parent" />
     <fragment android:name="com.example.timebank.SplashFragment"    

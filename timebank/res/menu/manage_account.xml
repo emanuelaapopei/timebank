@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_compose"
+        android:icon="@drawable/add_skill"
+        android:title="@string/action_skill"/>
+    <item
+        android:id="@+id/action_message"
+        android:icon="@drawable/add_messages"
+        android:title="@string/action_messages"/>
+    <item
+        android:id="@+id/action_session"
+        android:icon="@drawable/add_session"
+        android:title="@string/action_people"/>
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/add_alert"
+        android:title="@string/action_alert"/>
+
+</menu>

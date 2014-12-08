@@ -1,14 +1,22 @@
 package com.example.timebank;
 
-import com.facebook.model.OpenGraphAction;
-import com.facebook.widget.ProfilePictureView;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.facebook.model.GraphUser;
+import com.facebook.model.OpenGraphAction;
+import com.facebook.widget.ProfilePictureView;
+import com.parse.FindCallback;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseException;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,154 +28,234 @@ import android.widget.TextView;
 
 
 public class SessionFragment extends Fragment {
+	private static final String TAG = "timeBank";
+			
+	private ProfilePictureView profilePictureView;
+	private String userId;
+	
+	private ListView listView;
+	private List<BaseListElement> listElements;
+	private ActionListAdapter listAdapter = null;
+	
+	private Button addSession; 
+	
+	private GraphUser user;
+	private String completeName;
 
-    private ProfilePictureView profilePictureView;
-    private String userId;
-    private ListView listView;
-    private List<BaseListElement> listElements;
-    private Button addSession;
+	public SessionFragment(String UserId) {
+		userId = UserId;
+	}
 
-    public SessionFragment(String UserId) {
-        userId = UserId;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_session, container, false);
-
-        profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
-        profilePictureView.setProfileId(userId);
-
-        addSession = (Button) view.findViewById(R.id.test_button);
-        addSession.setOnClickListener(new View.OnClickListener() {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.fragment_session,
+				container, false);
+		
+		user = ((TimeBankApplication) getActivity().getApplication()).getUser();
+		
+		String firstName = user.getFirstName();
+		String lastName = user.getLastName();
+		
+		Log.d(TAG, firstName + " " + lastName);
+		
+		profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
+		profilePictureView.setProfileId(userId);
+		
+		addSession = (Button) view.findViewById(R.id.test_button); 
+		addSession.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                addNewSession();
+            	addNewSession();
             }
-        });
+        }); 
+		
+		// Find the list view
+		listView = (ListView) view.findViewById(R.id.session_list);
 
-        // Find the list view
-        listView = (ListView) view.findViewById(R.id.session_list);
-
-        // Set up the list view items, based on a list of
-        // BaseListElement items
-        listElements = new ArrayList<BaseListElement>();
-        // Add an item for the friend picker
-        listElements.add(new SessionListElement(0));
-        listElements.add(new SessionListElement(1));
-        listElements.add(new SessionListElement(2));
-        listElements.add(new SessionListElement(3));
-        // Set the list view adapter
-        listView.setAdapter(new ActionListAdapter(getActivity(), R.id.session_list, listElements));
-        init(savedInstanceState);
-        return view;
-    }
-
-    public void onCreate(Bundle savedInstanceState) {
+		// Set up the list view items, based on a list of
+		// BaseListElement items
+		listElements = new ArrayList<BaseListElement>();
+		
+		//read the elements from the database
+		updateSessionList();
+		// Set the list view adapter
+		//listAdapter = new ActionListAdapter(getActivity(), R.id.session_list, listElements);
+		listAdapter = new ActionListAdapter(getActivity(), R.id.session_list, listElements);
+		listView.setAdapter(listAdapter);
+		
+		init(savedInstanceState);
+		return view;
+	}
+	
+	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    public void onResume() {
+	}
+	
+	public void onResume() {
         super.onResume();
-    }
-
-    @Override
+	}
+	
+	@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
+	}
+	
+	@Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
+	}
+	
+	 @Override
+	 public void onPause() {
+	      super.onPause();
+	 }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
-
-    public void addNewSession() {
-        DialogFragment newFragment = new AddSessionDialog();
+    
+    public void addNewSession()
+    {
+    	DialogFragment newFragment = new AddSessionDialog();
         newFragment.show(getFragmentManager(), "session");
+        
+        updateView();
     }
-
+    
+    public void updateSessionList()
+    {
+    	ParseQuery<ParseObject> query = ParseQuery.getQuery("Session");
+    	
+    	query.whereEqualTo("Sender", "Ana");
+    	
+    	query.findInBackground(new FindCallback<ParseObject>() {
+    	    public void done(List<ParseObject> sessionList, ParseException e) {
+    	        if (e == null) {
+    	            Log.d(TAG, "Retrieved " + sessionList.size() + " scores");
+    	            
+    	            ParseObject session = new ParseObject("Session");
+    	            for (int i = 0; i < sessionList.size(); i++ )
+    	            {
+    	            	session = sessionList.get(i);
+    	            	String skill = session.getString("Skill");
+    	            	String sender = session.getString("Sender");
+    	            	int hours = session.getInt("Hours");
+    	            	String default_string = "by user " + sender + "for " + hours +" hours";
+    	            	
+    	            	Log.d(TAG, "Adding new item with values:" + skill + " " +sender+" "+hours);
+    	            	//listElements.add(new SessionListElement(i, skill, default_string));
+    	            	listAdapter.add(new SessionListElement(i, skill, default_string));
+    	            }
+    	            
+    	        } else {
+    	            Log.d(TAG, "Error: " + e.getMessage());
+    	        }
+    	    }
+    	});
+    	
+    	if (!getActivity().isFinishing()) {
+			// Update view
+			updateView();
+		}
+    	
+    	
+    	
+    	/*String text1 = getActivity().getResources().getString(R.string.session);
+		String text2 = getActivity().getResources().getString(R.string.session_default);
+		listElements.add(new SessionListElement(0, text1, text2));
+		listElements.add(new SessionListElement(1, text1, text2));
+		listElements.add(new SessionListElement(2, text1, text2));
+		listElements.add(new SessionListElement(3, text1, text2));*/
+    }
+    
+    public void updateView()
+    {
+    	if (listAdapter != null)
+    	{
+    		listAdapter.notifyDataSetChanged();
+    	}
+    	else
+    	{
+    		Log.d(TAG, "Adapter is null");
+    	}
+    }
+    
     /**
      * Resets the view to the initial defaults.
      */
     private void init(Bundle savedInstanceState) {
-
+    	
     }
+    	
+	private class ActionListAdapter extends ArrayAdapter<BaseListElement> {
+	    private List<BaseListElement> listElements;
 
-    private class ActionListAdapter extends ArrayAdapter<BaseListElement> {
-        private List<BaseListElement> listElements;
+	    public ActionListAdapter(Context context, int resourceId, 
+	                             List<BaseListElement> listElements) {
+	        super(context, resourceId, listElements);
+	        this.listElements = listElements;
+	        // Set up as an observer for list item changes to
+	        // refresh the view.
+	        for (int i = 0; i < listElements.size(); i++) {
+	            listElements.get(i).setAdapter(this);
+	        }
+	    }
 
-        public ActionListAdapter(Context context, int resourceId, List<BaseListElement> listElements) {
-            super(context, resourceId, listElements);
-            this.listElements = listElements;
-            // Set up as an observer for list item changes to
-            // refresh the view.
-            for (int i = 0; i < listElements.size(); i++) {
-                listElements.get(i).setAdapter(this);
-            }
-        }
+	    @Override
+	    public View getView(int position, View convertView, ViewGroup parent) {
+	        View view = convertView;
+	        if (view == null) {
+	            LayoutInflater inflater =
+	                    (LayoutInflater) getActivity()
+	                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	            view = inflater.inflate(R.layout.listitem, null);
+	        }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.listitem, null);
-            }
+	        BaseListElement listElement = listElements.get(position);
+	        if (listElement != null) {
+	            view.setOnClickListener(listElement.getOnClickListener());
+	            ImageView icon = (ImageView) view.findViewById(R.id.icon);
+	            TextView text1 = (TextView) view.findViewById(R.id.text1);
+	            TextView text2 = (TextView) view.findViewById(R.id.text2);
+	            if (icon != null) {
+	                icon.setImageDrawable(listElement.getIcon());
+	            }
+	            if (text1 != null) {
+	                text1.setText(listElement.getText1());
+	            }
+	            if (text2 != null) {
+	                text2.setText(listElement.getText2());
+	            }
+	        }
+	        return view;
+	    }
 
-            BaseListElement listElement = listElements.get(position);
-            if (listElement != null) {
-                view.setOnClickListener(listElement.getOnClickListener());
-                ImageView icon = (ImageView) view.findViewById(R.id.icon);
-                TextView text1 = (TextView) view.findViewById(R.id.text1);
-                TextView text2 = (TextView) view.findViewById(R.id.text2);
-                if (icon != null) {
-                    icon.setImageDrawable(listElement.getIcon());
-                }
-                if (text1 != null) {
-                    text1.setText(listElement.getText1());
-                }
-                if (text2 != null) {
-                    text2.setText(listElement.getText2());
-                }
-            }
-            return view;
-        }
+	}
+	
+	private class SessionListElement extends BaseListElement {
 
-    }
+	    public SessionListElement(int requestCode, String text1, String text2) {
+	        super(getActivity().getResources().getDrawable(R.drawable.add_session),
+	              text1,//getActivity().getResources().getString(R.string.session),
+	              text2,//getActivity().getResources().getString(R.string.session_default),
+	              requestCode);
+	    }
 
-    private class SessionListElement extends BaseListElement {
+	    @Override
+	    protected View.OnClickListener getOnClickListener() {
+	        return new View.OnClickListener() {
+	            @Override
+	            public void onClick(View view) {
+	                // Do nothing for now
+	            }
+	        };
+	    }
 
-        public SessionListElement(int requestCode) {
-            super(getActivity().getResources().getDrawable(R.drawable.add_session),
-                    getActivity().getResources().getString(R.string.session),
-                    getActivity().getResources().getString(R.string.session_default),
-                    requestCode);
-        }
-
-        @Override
-        protected View.OnClickListener getOnClickListener() {
-            return new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Do nothing for now
-                }
-            };
-        }
-
-        @Override
-        protected void populateOGAction(OpenGraphAction action) {
-            // TODO Auto-generated method stub
-
-        }
-    }
+		@Override
+		protected void populateOGAction(OpenGraphAction action) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
 }

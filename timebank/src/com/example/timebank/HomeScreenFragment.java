@@ -221,6 +221,7 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
                 if (session == Session.getActiveSession()) {
                     if (user != null) {
                         profilePictureView.setProfileId(user.getId());
+                        ((TimeBankApplication) getActivity().getApplication()).setUser(user);
                     }
                 }
                 if (response.getError() != null) {

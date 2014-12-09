@@ -39,8 +39,7 @@ public class SessionFragment extends Fragment {
 	
 	private Button addSession; 
 	
-	private GraphUser user;
-	private String completeName;
+	private GraphUser fbUser;	
 
 	public SessionFragment(String UserId) {
 		userId = UserId;
@@ -51,13 +50,6 @@ public class SessionFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_session,
 				container, false);
-		
-		user = ((TimeBankApplication) getActivity().getApplication()).getUser();
-		
-		String firstName = user.getFirstName();
-		String lastName = user.getLastName();
-		
-		Log.d(TAG, firstName + " " + lastName);
 		
 		profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
 		profilePictureView.setProfileId(userId);
@@ -125,10 +117,15 @@ public class SessionFragment extends Fragment {
     
     public void updateSessionList()
     {
+    	fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
+		
+		String firstName = fbUser.getFirstName();
+		String lastName = fbUser.getLastName();
+		
     	ParseQuery<ParseObject> query = ParseQuery.getQuery("Session");
     	
-    	query.whereEqualTo("Sender", "Ana");
-    	
+    	query.whereEqualTo("Sender", firstName + " " + lastName);
+    	//query.whereEqualTo("Sender", "Ana");
     	query.findInBackground(new FindCallback<ParseObject>() {
     	    public void done(List<ParseObject> sessionList, ParseException e) {
     	        if (e == null) {
@@ -139,11 +136,11 @@ public class SessionFragment extends Fragment {
     	            {
     	            	session = sessionList.get(i);
     	            	String skill = session.getString("Skill");
-    	            	String sender = session.getString("Sender");
+    	            	String receiver = session.getString("Receiver");
     	            	int hours = session.getInt("Hours");
-    	            	String default_string = "by user " + sender + "for " + hours +" hours";
+    	            	String default_string = "to user " + receiver + " for " + hours +" hours";
     	            	
-    	            	Log.d(TAG, "Adding new item with values:" + skill + " " +sender+" "+hours);
+    	            	Log.d(TAG, "Adding new item with values:" + skill + " " +receiver+" "+hours);
     	            	//listElements.add(new SessionListElement(i, skill, default_string));
     	            	listAdapter.add(new SessionListElement(i, skill, default_string));
     	            }

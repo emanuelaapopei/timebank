@@ -1,5 +1,6 @@
 package com.example.timebank;
 
+import com.facebook.model.GraphUser;
 import com.parse.ParseObject;
 
 import android.app.Activity;
@@ -21,6 +22,8 @@ public class AddSessionDialog extends DialogFragment {
 	private EditText hours;
 	
 	private View dialogView;
+	
+	private GraphUser fbUser;
 	
 	private static final String TAG = "timeBank";
 	
@@ -95,6 +98,13 @@ public class AddSessionDialog extends DialogFragment {
 		Log.d(TAG,user.getText().toString());
 		Log.d(TAG,hours.getText().toString());
 		
+		fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
+		
+		String firstName = fbUser.getFirstName();
+		String lastName = fbUser.getLastName();
+		
+		//Log.d(TAG, firstName + " " + lastName);
+		
 		ParseObject session = new ParseObject("Session");
 		
 		if (skill != null)
@@ -103,7 +113,7 @@ public class AddSessionDialog extends DialogFragment {
 		}
 		if (user != null)
 		{
-			session.put("Sender", user.getText().toString());
+			session.put("Sender", firstName + " " + lastName);
 			session.put("Receiver", user.getText().toString());
 		}
 		if (hours != null)

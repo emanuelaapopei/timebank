@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class AddSessionDialog extends DialogFragment {
@@ -20,7 +21,7 @@ public class AddSessionDialog extends DialogFragment {
 	private EditText skill;
 	private EditText user;
 	private EditText hours;
-	
+		
 	private View dialogView;
 	
 	private GraphUser fbUser;

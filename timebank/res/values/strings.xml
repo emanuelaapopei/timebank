@@ -66,6 +66,11 @@
     <string name="user_input">User</string>
     <string name="experience_input">Level of experience</string>
     <string name="hours_input">Hours</string>
+    <string name="feedback_input">Feedback</string>
+    <string name="rating_input">Rating</string>   
+    <string name="ans_session">Answer the session</string>
+    <string name="approve_session">Approve</string>
+    <string name="reject_session">Reject</string>
 
     <!-- Dialog string arrays -->
     <string-array name="experience_level">

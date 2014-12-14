@@ -11,6 +11,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseException;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -115,6 +116,12 @@ public class SessionFragment extends Fragment {
         updateView();
     }
     
+    public void answerSession(ParseObject SessionParse)
+    {
+    	DialogFragment newFragment = new AnswerSessionDialog(SessionParse);
+        newFragment.show(getFragmentManager(), "answerSession");
+    }
+    
     public void updateSessionList()
     {
     	fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
@@ -126,6 +133,7 @@ public class SessionFragment extends Fragment {
     	
     	query.whereEqualTo("Sender", firstName + " " + lastName);
     	//query.whereEqualTo("Sender", "Ana");
+    	
     	query.findInBackground(new FindCallback<ParseObject>() {
     	    public void done(List<ParseObject> sessionList, ParseException e) {
     	        if (e == null) {
@@ -138,11 +146,14 @@ public class SessionFragment extends Fragment {
     	            	String skill = session.getString("Skill");
     	            	String receiver = session.getString("Receiver");
     	            	int hours = session.getInt("Hours");
+    	            	String status = session.getString("Status");
+    	            	
+    	            	String main_string = skill + " - " + status;
     	            	String default_string = "to user " + receiver + " for " + hours +" hours";
     	            	
-    	            	Log.d(TAG, "Adding new item with values:" + skill + " " +receiver+" "+hours);
+    	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +receiver+" "+hours);
     	            	//listElements.add(new SessionListElement(i, skill, default_string));
-    	            	listAdapter.add(new SessionListElement(i, skill, default_string));
+    	            	listAdapter.add(new SessionListElement(i, main_string, default_string, session));
     	            }
     	            
     	        } else {
@@ -232,11 +243,14 @@ public class SessionFragment extends Fragment {
 	
 	private class SessionListElement extends BaseListElement {
 
-	    public SessionListElement(int requestCode, String text1, String text2) {
+		private ParseObject sesionParse;
+	    public SessionListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
 	        super(getActivity().getResources().getDrawable(R.drawable.add_session),
 	              text1,//getActivity().getResources().getString(R.string.session),
 	              text2,//getActivity().getResources().getString(R.string.session_default),
 	              requestCode);
+	        
+	        sesionParse = parseObj;
 	    }
 
 	    @Override
@@ -244,7 +258,19 @@ public class SessionFragment extends Fragment {
 	        return new View.OnClickListener() {
 	            @Override
 	            public void onClick(View view) {
-	                // Do nothing for now
+	            	
+	            	String status = sesionParse.getString("Status");
+
+	            	if (status.equals("New"))
+	            	{
+	            		answerSession(sesionParse);
+	            	}
+	            	else
+	            	{
+	            		AlertDialog alert = new AlertDialog.Builder(getActivity()).create();
+	            		alert.setMessage("Aceasta sesiune a fost deja aprobata/respinsa.");
+	            		alert.show();
+	            	}
 	            }
 	        };
 	    }

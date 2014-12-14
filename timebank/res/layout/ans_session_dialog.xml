@@ -1,0 +1,135 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                tools:context=".LinearLayout" >
+                
+                        
+          <LinearLayout
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:paddingTop="20dp">
+      
+              <TextView
+                  android:layout_width="75dp"
+                  android:layout_height="wrap_content"
+                  android:paddingLeft="10dp"
+                  android:paddingTop="20dp"
+                  android:text="@string/skill_input" />
+      
+              <EditText
+                  android:id="@+id/skill_ans_session"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="10dp"
+                  android:layout_weight="0.50"
+                  android:enabled="false"
+                  android:inputType="text"
+                  android:paddingTop="20dp" />
+
+          </LinearLayout>
+                        
+          <LinearLayout
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:paddingTop="20dp">
+          
+               <TextView
+                   android:layout_width="75dp"
+                   android:layout_height="wrap_content"
+                   android:paddingLeft="10dp"
+                   android:paddingTop="20dp"
+                   android:text="@string/user_input" />
+               
+               <EditText
+                   android:id="@+id/user_ans_session"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center_horizontal"
+                   android:layout_marginLeft="10dp"
+                   android:layout_weight="0.37"
+                   android:enabled="false"
+                   android:inputType="text"
+                   android:paddingTop="20dp" />
+       
+          </LinearLayout>
+          
+          <LinearLayout
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:paddingTop="20dp">
+          
+               <TextView
+                   android:layout_width="75dp"
+                   android:layout_height="wrap_content"
+                   android:paddingLeft="10dp"
+                   android:paddingTop="20dp"
+                   android:text="@string/hours_input" />
+               
+               <EditText
+                   android:id="@+id/hours_ans_session"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center_horizontal"
+                   android:layout_marginLeft="10dp"
+                   android:layout_weight="0.44"
+                   android:enabled="false"
+                   android:inputType="number"
+                   android:paddingTop="20dp" />
+       
+          </LinearLayout>
+          
+          <LinearLayout
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:paddingTop="20dp">
+          
+               <TextView
+                   android:layout_width="75dp"
+                   android:layout_height="wrap_content"
+                   android:paddingLeft="10dp"
+                   android:paddingTop="20dp"
+                   android:text="@string/feedback_input" />
+               
+               <EditText
+                   android:id="@+id/feedback_ans_session"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center_horizontal"
+                   android:layout_marginLeft="10dp"
+                   android:layout_weight="0.44"
+                   android:inputType="text"
+                   android:paddingTop="20dp"
+                   android:singleLine="false" />
+       
+          </LinearLayout>
+          
+          <LinearLayout
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:paddingTop="20dp" >
+
+              <!-- TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:paddingLeft="10dp"
+                  android:paddingTop="20dp"
+                  android:text="@string/rating_input" /-->
+
+              <RatingBar
+                  android:id="@+id/ratingBar"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="center_horizontal"
+                  android:layout_marginLeft="20dp"
+                  android:numStars="5" />
+          </LinearLayout>
+                                    
+</LinearLayout>

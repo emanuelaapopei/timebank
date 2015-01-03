@@ -8,31 +8,36 @@
         android:background="@drawable/wallhome"
         android:orientation="vertical">
 
-    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@color/thememain_color">
+   <LinearLayout
+             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
+            
         <com.facebook.widget.ProfilePictureView
-                android:id="@+id/selection_profile_pic"
+               android:id="@+id/selection_profile_pic"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:gravity="right|center_vertical"
+                android:layout_alignParentLeft="true"
                 android:layout_margin="10dp"
-                facebook:preset_size="small"/>
-    </RelativeLayout>
+                facebook:preset_size="normal"/>
+   </LinearLayout>
 
-    <ScrollView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:fillViewport="true"
-            android:background="#FFF">
-
-        <LinearLayout
+   <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="vertical">
+        <Button
+               android:id="@+id/test_button"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="@string/add_skill"/>
+        
+    <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:fillViewport="true">
 
             <com.example.timebank.FullListView
                     android:id="@+id/skill_list"
@@ -41,13 +46,8 @@
                     android:layout_margin="20dp"
                     android:dividerHeight="@dimen/item_list_padding"
                     android:divider="#00000000"/>
-
-            <Button
-                    android:id="@+id/test_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_skill"/>
-        </LinearLayout>
+       
     </ScrollView>
+    </LinearLayout>
 </LinearLayout>
 

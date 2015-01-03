@@ -8,23 +8,28 @@
         android:background="@drawable/wallhome"
         android:orientation="vertical">
                     
-    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@color/thememain_color">
+    <LinearLayout
+             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
 
         <com.facebook.widget.ProfilePictureView
                 android:id="@+id/selection_profile_pic"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:gravity="right|center_vertical"
+                android:layout_alignParentLeft="true"
                 android:layout_margin="10dp"
-                facebook:preset_size="small"/>
+                facebook:preset_size="normal"/>
                 
-    </RelativeLayout>
-      
+    </LinearLayout>
+     
+    <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical">  
+                
     <Button android:id="@+id/test_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -33,12 +38,7 @@
     <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:fillViewport="true"
-            android:background="#FFF">
-        <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical">
+            android:fillViewport="true">
                     
             <com.example.timebank.FullListView
                     android:id="@+id/session_list"
@@ -47,8 +47,9 @@
                     android:layout_margin="20dp"
                     android:dividerHeight="@dimen/item_list_padding"
                     android:divider="#00000000"/>                            
-            
-        </LinearLayout>
+           
     </ScrollView>
+    
+    </LinearLayout>
 </LinearLayout>
 

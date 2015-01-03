@@ -3,14 +3,20 @@ package com.example.timebank;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.facebook.model.GraphUser;
 import com.facebook.model.OpenGraphAction;
 import com.facebook.widget.ProfilePictureView;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +28,18 @@ import android.widget.TextView;
 
 
 public class AlertFragment extends Fragment {
+	private static final String TAG = "timeBank";
 	
 	private ProfilePictureView profilePictureView;
 	private String userId;
+	
 	private Button addAlert; 
 	
 	private ListView listView;
 	private List<BaseListElement> listElements;
+	private ActionListAdapter listAdapter = null;
+	
+	private GraphUser fbUser;
 
 	public AlertFragment(String UserId) {
 		userId = UserId;
@@ -56,14 +67,13 @@ public class AlertFragment extends Fragment {
 		// Set up the list view items, based on a list of
 		// BaseListElement items
 		listElements = new ArrayList<BaseListElement>();
-		// Add an item for the friend picker
-		listElements.add(new AlertListElement(0));
-		listElements.add(new AlertListElement(1));
-		listElements.add(new AlertListElement(2));
-		listElements.add(new AlertListElement(3));
-		// Set the list view adapter
-		listView.setAdapter(new ActionListAdapter(getActivity(), 
-		                    R.id.alert_list, listElements));
+		
+		//read the elements from the database
+		updateAlertList();
+		
+		listAdapter = new ActionListAdapter(getActivity(), R.id.alert_list, listElements);
+		listView.setAdapter(listAdapter);
+		
 		init(savedInstanceState);
 		return view;
 	}
@@ -100,6 +110,69 @@ public class AlertFragment extends Fragment {
     {
     	DialogFragment newFragment = new AddAlertDialog();
         newFragment.show(getFragmentManager(), "alert");
+    }
+    
+    public void updateAlertList()
+    {
+    	fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
+    	
+    	String firstName = fbUser.getFirstName();
+		String lastName = fbUser.getLastName();
+		
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Alert");
+		
+		query.whereEqualTo("CreatedBy", firstName + " " + lastName);
+		
+		query.findInBackground(new FindCallback<ParseObject>() {
+    	    public void done(List<ParseObject> alertList, ParseException e) {
+    	        if (e == null) {
+    	            Log.d(TAG, "Retrieved " + alertList.size() + " alerts");
+    	            
+    	            ParseObject alert = new ParseObject("Alert");
+    	            for (int i = 0; i < alertList.size(); i++ )
+    	            {
+    	            	alert = alertList.get(i);
+    	            	String skill = alert.getString("Skill");
+    	            	String alertFromUser = alert.getString("AlertFromUser");
+    	            	
+    	            	String main_string = "Alert for skill: " + skill;
+    	            	String default_string = "";
+    	            	if (!alertFromUser.equals(""))
+    	            	{
+    	            		default_string = "from user " + alertFromUser;
+    	            	}
+    	            	else 
+    	            	{
+    	            		default_string = "no user specified";
+    	            	}
+    	            	
+    	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
+    	            	//listElements.add(new SessionListElement(i, skill, default_string));
+    	            	listAdapter.add(new AlertListElement(i, main_string, default_string, alert));
+    	            }
+    	            
+    	        } else {
+    	            Log.d(TAG, "Error: " + e.getMessage());
+    	        }
+    	    }
+    	});
+		
+		if (!getActivity().isFinishing()) {
+			// Update view
+			updateView();
+		}
+    }
+    
+    public void updateView()
+    {
+    	if (listAdapter != null)
+    	{
+    		listAdapter.notifyDataSetChanged();
+    	}
+    	else
+    	{
+    		Log.d(TAG, "Adapter is null");
+    	}
     }
     /**
      * Resets the view to the initial defaults.
@@ -155,12 +228,15 @@ public class AlertFragment extends Fragment {
 	}
 	
 	private class AlertListElement extends BaseListElement {
-
-	    public AlertListElement(int requestCode) {
+		private ParseObject alertParse;
+		
+	    public AlertListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
 	        super(getActivity().getResources().getDrawable(R.drawable.add_alert),
-	              getActivity().getResources().getString(R.string.alert),
-	              getActivity().getResources().getString(R.string.alert_default),
+	              text1,
+	              text2,
 	              requestCode);
+	        
+	        alertParse = parseObj;
 	    }
 
 	    @Override

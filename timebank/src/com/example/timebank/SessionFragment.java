@@ -71,8 +71,8 @@ public class SessionFragment extends Fragment {
 		
 		//read the elements from the database
 		updateSessionList();
+		
 		// Set the list view adapter
-		//listAdapter = new ActionListAdapter(getActivity(), R.id.session_list, listElements);
 		listAdapter = new ActionListAdapter(getActivity(), R.id.session_list, listElements);
 		listView.setAdapter(listAdapter);
 		
@@ -167,14 +167,6 @@ public class SessionFragment extends Fragment {
 			updateView();
 		}
     	
-    	
-    	
-    	/*String text1 = getActivity().getResources().getString(R.string.session);
-		String text2 = getActivity().getResources().getString(R.string.session_default);
-		listElements.add(new SessionListElement(0, text1, text2));
-		listElements.add(new SessionListElement(1, text1, text2));
-		listElements.add(new SessionListElement(2, text1, text2));
-		listElements.add(new SessionListElement(3, text1, text2));*/
     }
     
     public void updateView()

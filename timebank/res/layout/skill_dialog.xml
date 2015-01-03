@@ -5,7 +5,7 @@
     android:orientation="vertical" >
     
 <EditText
-        android:id="@+id/skill"
+        android:id="@+id/skill_from_skill"
         android:inputType="text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
         android:layout_marginBottom="4dp"
         android:hint="@string/skill_input" />
     <EditText
-        android:id="@+id/experience"
+        android:id="@+id/experience_from_skill"
         android:inputType="text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

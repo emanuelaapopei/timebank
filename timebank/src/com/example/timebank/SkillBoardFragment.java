@@ -3,14 +3,20 @@ package com.example.timebank;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.facebook.model.GraphUser;
 import com.facebook.model.OpenGraphAction;
 import com.facebook.widget.ProfilePictureView;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +28,16 @@ import android.widget.TextView;
 
 
 public class SkillBoardFragment extends Fragment {
+	private static final String TAG = "timeBank";
 	
 	private ProfilePictureView profilePictureView;
 	private String userId;
 	
 	private ListView listView;
 	private List<BaseListElement> listElements;
+	private ActionListAdapter listAdapter = null;
+	
+	private GraphUser fbUser;
 	
 	private Button addSkill; 
 
@@ -57,14 +67,13 @@ public class SkillBoardFragment extends Fragment {
 		// Set up the list view items, based on a list of
 		// BaseListElement items
 		listElements = new ArrayList<BaseListElement>();
-		// Add an item for the friend picker
-		listElements.add(new SkillListElement(0));
-		listElements.add(new SkillListElement(1));
-		listElements.add(new SkillListElement(2));
-		listElements.add(new SkillListElement(3));
+		
+		updateSkillList();
+		
+		listAdapter = new ActionListAdapter(getActivity(), R.id.skill_list, listElements);
 		// Set the list view adapter
-		listView.setAdapter(new ActionListAdapter(getActivity(), 
-		                    R.id.skill_list, listElements));
+		listView.setAdapter(listAdapter);
+		
 		init(savedInstanceState);
 		return view;
 	}
@@ -101,6 +110,60 @@ public class SkillBoardFragment extends Fragment {
     {
     	DialogFragment newFragment = new AddSkillDialog();
         newFragment.show(getFragmentManager(), "skill");
+    }
+    
+    public void updateSkillList()
+    {
+    	fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
+    	
+    	String firstName = fbUser.getFirstName();
+		String lastName = fbUser.getLastName();
+		
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Skill");
+		
+		query.whereEqualTo("CreatedBy", firstName + " " + lastName);
+		query.findInBackground(new FindCallback<ParseObject>() {
+    	    public void done(List<ParseObject> skillList, ParseException e) {
+    	        if (e == null) {
+    	            Log.d(TAG, "Retrieved " + skillList.size() + " alerts");
+    	            
+    	            ParseObject skillParse = new ParseObject("Skill");
+    	            for (int i = 0; i < skillList.size(); i++ )
+    	            {
+    	            	skillParse = skillList.get(i);
+    	            	String skill = skillParse.getString("Skill");
+    	            	String experience = skillParse.getString("Experience");
+    	            	
+    	            	String main_string = skill;
+    	            	String default_string = "Nivel: " + experience;
+    	            	
+    	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
+    	            	//listElements.add(new SessionListElement(i, skill, default_string));
+    	            	listAdapter.add(new SkillListElement(i, main_string, default_string, skillParse));
+    	            }
+    	            
+    	        } else {
+    	            Log.d(TAG, "Error: " + e.getMessage());
+    	        }
+    	    }
+    	});
+		
+		if (!getActivity().isFinishing()) {
+			// Update view
+			updateView();
+		}
+    }
+    
+    public void updateView()
+    {
+    	if (listAdapter != null)
+    	{
+    		listAdapter.notifyDataSetChanged();
+    	}
+    	else
+    	{
+    		Log.d(TAG, "Adapter is null");
+    	}
     }
     
     /**
@@ -156,12 +219,15 @@ public class SkillBoardFragment extends Fragment {
 	}
 	
 	private class SkillListElement extends BaseListElement {
-
-	    public SkillListElement(int requestCode) {
+		private ParseObject skillParse;
+		
+	    public SkillListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
 	        super(getActivity().getResources().getDrawable(R.drawable.add_skill),
-	              getActivity().getResources().getString(R.string.skill),
-	              getActivity().getResources().getString(R.string.skill_default),
+	              text1,
+	              text2,
 	              requestCode);
+	        
+	        skillParse = parseObj;
 	    }
 
 	    @Override

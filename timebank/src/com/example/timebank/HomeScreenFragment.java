@@ -24,11 +24,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.*;
+
 import com.facebook.*;
 import com.facebook.internal.Utility;
 import com.facebook.model.*;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.ProfilePictureView;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,6 +70,10 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     private Uri photoUri;
     private ImageView photoThumbnail;
 
+    private GraphUser fbUser;
+    private View currentView;
+    private TextView balanceView;
+    
     private UiLifecycleHelper uiHelper;
     private Session.StatusCallback sessionCallback = new Session.StatusCallback() {
         @Override
@@ -120,7 +130,7 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.homescreen, container, false);
-
+        
         view.setOnTouchListener(new OnSwipeTouchListener(activity) {
             @Override
             public void onSwipeRight() {
@@ -156,7 +166,12 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
 //            messageButton.setVisibility(View.VISIBLE);
 //        }
 
+        //Log.e(TAG, "before init in HomeScreen");
+        
+        balanceView = (TextView) view.findViewById(R.id.balanceAAA);
+        //balanceView.setText( "bla" );
         init(savedInstanceState);
+        
         return view;
     }
 
@@ -215,12 +230,16 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     }
 
     private void makeMeRequest(final Session session) {
+    	
+    	//Log.d(TAG, "Entered makeMeRequest");
+    	
         Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
             @Override
             public void onCompleted(GraphUser user, Response response) {
                 if (session == Session.getActiveSession()) {
                     if (user != null) {
                         profilePictureView.setProfileId(user.getId());
+                        
                         ((TimeBankApplication) getActivity().getApplication()).setUser(user);
                     }
                 }
@@ -239,6 +258,8 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     private void init(Bundle savedInstanceState) {
 //        testButton.setEnabled(false);
 
+    	//Log.d(TAG, "Entered init of HomeScreenFragment");
+    	
         listElements = new ArrayList<BaseListElement>();
         listElements.add(new SkillListElement(0));
         listElements.add(new LocationListElement(1));
@@ -257,7 +278,62 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
         Session session = Session.getActiveSession();
         if (session != null && session.isOpened()) {
             makeMeRequest(session);
+            
+            getBalanceFromDB();
         }
+    }
+    
+    private void getBalanceFromDB()
+    {
+    	//Log.d(TAG, "Entered getBalanceFromDB");
+    	//check if the current user has balance in the database
+    	fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
+    	
+    	String firstName = fbUser.getFirstName();
+		String lastName = fbUser.getLastName();
+		final String username = firstName + " " + lastName;
+		
+		
+    	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+    	
+    	query.whereEqualTo("username", firstName + " " + lastName);
+    	query.findInBackground(new FindCallback<ParseObject>() {
+    	    public void done(List<ParseObject> userList, ParseException e) {
+    	        if (e == null) {
+    	            Log.d(TAG, "Retrieved " + userList.size() + " users");
+    	            int balance = 0;
+    	            
+    	            ParseObject userParse = new ParseObject("User");
+    	            if (userList.size() == 0)
+    	            {
+    	            	//user doesn't have balance - first time he logs in the app
+    	            	//must save a User with default 5h balance
+    	            	userParse.put("fbID", profilePictureView.getProfileId());
+    	            	userParse.put("username", username);
+    	            	userParse.put("balance", 5);
+    	            	
+    	            	userParse.saveInBackground();
+    	            	
+    	            	((TimeBankApplication) getActivity().getApplication()).setBalance(5);
+    	            	balance = 5;
+    	            }
+    	            else
+    	            {
+    	           		userParse = userList.get(0);
+	            		balance = userParse.getInt("balance");
+	            		Log.d(TAG, "balance from db=  " + balance);
+	            		((TimeBankApplication) getActivity().getApplication()).setBalance(balance);	            	
+    	            }
+    	            
+    	            //set the balance in GUI--keep this code here
+    	             Log.d(TAG, "new balance =  " + balance);
+    	            balanceView.setText( balance + "hrs" );
+    	        } else {
+    	            Log.d(TAG, "Error: " + e.getMessage());
+    	        }
+    	    }
+    	});
+    	
     }
 
     private void handleAnnounce(boolean isMessage) {

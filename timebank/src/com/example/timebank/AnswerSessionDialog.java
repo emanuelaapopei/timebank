@@ -1,6 +1,11 @@
 package com.example.timebank;
 
+import java.util.List;
+
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -79,6 +84,8 @@ public class AnswerSessionDialog extends DialogFragment{
                 	   sessionParse.put("Status", "Approved");
                 	   sessionParse.saveInBackground();
                 	   
+                	   //update the balance for the user
+                	   updateBalance(user.getText().toString());
                    }
                })
                .setNegativeButton(R.string.reject_session, new DialogInterface.OnClickListener() {
@@ -92,5 +99,41 @@ public class AnswerSessionDialog extends DialogFragment{
         // Create the AlertDialog object and return it
         return builder.create();
     }
+	
+	private void updateBalance(String user)
+	{
+		 Log.d(TAG, "Update balance for user " + user);
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+		query.whereEqualTo("username", user);
+		
+		query.findInBackground(new FindCallback<ParseObject>() {
+    	    public void done(List<ParseObject> userList, ParseException e) {
+    	        if (e == null) {
+    	        	 Log.d(TAG, "Retrieved " + userList.size() + " users");
+     	            
+     	            ParseObject userParse = new ParseObject("User");
+     	            
+     	            for (int i = 0; i < userList.size(); i++)
+     	            {
+     	            	userParse = userList.get(i);
+     	            	int balance = userParse.getInt("balance");
+     	            	
+     	            	Log.d(TAG, "Old balance =  " + balance);
+     	            	
+     	            	balance += sessionParse.getInt("Hours");
+     	            	
+     	            	Log.d(TAG, "New balance =  " + balance);
+     	            	
+     	            	userParse.put("balance", balance);
+     	            	userParse.saveInBackground();
+     	            	Log.d(TAG, "Saved the user Parse object");
+     	            }
+    	        }
+    	        else {
+    	            Log.d(TAG, "Error: " + e.getMessage());
+    	        }
+    	    }
+		});
+	}
 
 }

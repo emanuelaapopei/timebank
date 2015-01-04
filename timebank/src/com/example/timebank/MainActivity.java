@@ -187,6 +187,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void showFragment(int fragmentIndex, boolean addToBackStack) {
+    	
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         for (int i = 0; i < fragments.length; i++) {

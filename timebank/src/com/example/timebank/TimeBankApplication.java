@@ -13,6 +13,7 @@ public class TimeBankApplication extends Application {
     private List<GraphUser> selectedUsers;
     private GraphPlace selectedPlace;
     private GraphUser fbUser;
+    private int balance;
 
     public List<GraphUser> getSelectedUsers() {
         return selectedUsers;
@@ -38,5 +39,15 @@ public class TimeBankApplication extends Application {
 	public void setUser(GraphUser User)
 	{
 		this.fbUser = User;
+	}
+	
+	public int getBalance()
+	{
+		return balance;
+	}
+	
+	public void setBalance(int newBalance)
+	{
+		balance = newBalance;
 	}
 }

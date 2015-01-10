@@ -12,8 +12,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:orientation="horizontal">
-        <!--android:alpha="0.7"-->
-
+        
         <com.facebook.widget.ProfilePictureView
                 android:id="@+id/selection_profile_pic"
                 android:layout_width="wrap_content"
@@ -23,6 +22,7 @@
                 facebook:preset_size="normal"/>
 
         <ImageView
+                android:id="@+id/balance_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -30,7 +30,7 @@
                 android:src="@drawable/balance"/>
 
         <TextView
-            	android:id="@+id/balanceAAA"
+            	android:id="@+id/balance_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -40,60 +40,9 @@
                 android:paddingBottom="7px"
                 android:shadowColor="#D5F0F0"
                 android:textStyle="bold"
-                android:typeface="sans"/>
-        <!--android:shadowDx="6"-->
-        <!--android:shadowDy="6"-->
-        <!--android:shadowRadius="6"-->
+                android:typeface="sans"/>     
     </LinearLayout>
-
-        <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical">
-
-            <com.example.timebank.FullListView
-                    android:id="@+id/selection_list"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:divider="#00000000"
-                    android:dividerHeight="@dimen/item_list_padding"/>
-
-            <ImageView
-                    android:id="@+id/selected_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginLeft="50dp"
-                    android:layout_marginRight="50dp"
-                    android:layout_weight="1"/>
-        </LinearLayout>
-
-        <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:fillViewport="true"
-        android:background="#FFF">
-        <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-
-        <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hours_balance"/>
-        <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hours_balance"/>
-        <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hours_balance"/>
-        </LinearLayout>
-        </ScrollView>
-      
-
+    
     </LinearLayout>
 
 

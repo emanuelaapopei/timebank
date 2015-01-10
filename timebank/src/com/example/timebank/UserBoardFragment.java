@@ -1,15 +1,16 @@
 package com.example.timebank;
 
 import com.facebook.model.OpenGraphAction;
-
+import android.view.GestureDetector.OnGestureListener;
+import android.view.GestureDetector;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -25,31 +26,33 @@ import org.json.JSONObject;
 import java.io.*;
 
 
-public class UserBoardFragment extends Fragment {
+public class UserBoardFragment extends Fragment implements OnGestureListener{
 
     private static final String TAG = "timeBank";
     private String userId;
     private ListView listView;
     private List<BaseListElement> listElements;
-    private ActionListAdapter listAdapter = null;
-
     private UserBoardActivity activity;
-
-    public UserBoardFragment(String UserId) {
-        userId = UserId;
-    }
+    GestureDetector detector;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = (UserBoardActivity) getActivity();
         userId = ((TimeBankApplication) getActivity().getApplication()).getUserId();
+        detector = new GestureDetector(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_user_board, container, false);
+        view.setOnTouchListener(new OnSwipeTouchListener(activity) {
+            @Override
+            public void onSwipeLeft() {
+                activity.finish();
+            }
+        });
         
         // Find the list view
         listView = (ListView) view.findViewById(R.id.selection_list);
@@ -60,7 +63,7 @@ public class UserBoardFragment extends Fragment {
         listElements.add(new MessagesListElement(1));
         listElements.add(new SessionListElement(2));
         listElements.add(new AlertListElement(3));
-        listView.setAdapter(new ActionListAdapter(getActivity(), R.id.selection_list, listElements));
+        listView.setAdapter(new ActionListAdapter(getActivity(), R.id.selection_list, listElements));        
         return view;
     }
 
@@ -372,5 +375,46 @@ public class UserBoardFragment extends Fragment {
 
     }
 
+    public UserBoardFragment(String UserId) {
+        userId = UserId;
+    }
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

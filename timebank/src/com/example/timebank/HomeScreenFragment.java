@@ -123,11 +123,6 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
             public void onSwipeRight() {
                 startUserBoardActivity();
             }
-
-            @Override
-            public void onSwipeLeft() {
-                Toast.makeText(activity.getApplicationContext(), "Close board", 100).show();
-            }
         });
 
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
@@ -477,6 +472,7 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
             Uri data = Uri.parse(userId);
             intent.setData(data);
             intent.setClass(getActivity(), UserBoardActivity.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
             startActivity(intent);
         } catch (Exception e) {
             Toast.makeText(activity.getApplicationContext(), e.toString(), 100).show();

@@ -237,7 +237,7 @@ public class SessionFragment extends Fragment {
 
 		private ParseObject sesionParse;
 	    public SessionListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
-	        super(getActivity().getResources().getDrawable(R.drawable.add_session),
+	        super(getActivity().getResources().getDrawable(R.drawable.session),
 	              text1,//getActivity().getResources().getString(R.string.session),
 	              text2,//getActivity().getResources().getString(R.string.session_default),
 	              requestCode);

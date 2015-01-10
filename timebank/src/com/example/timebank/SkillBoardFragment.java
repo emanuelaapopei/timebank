@@ -222,7 +222,7 @@ public class SkillBoardFragment extends Fragment {
 		private ParseObject skillParse;
 		
 	    public SkillListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
-	        super(getActivity().getResources().getDrawable(R.drawable.add_skill),
+	        super(getActivity().getResources().getDrawable(R.drawable.skill),
 	              text1,
 	              text2,
 	              requestCode);

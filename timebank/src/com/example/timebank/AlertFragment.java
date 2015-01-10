@@ -231,7 +231,7 @@ public class AlertFragment extends Fragment {
 		private ParseObject alertParse;
 		
 	    public AlertListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
-	        super(getActivity().getResources().getDrawable(R.drawable.add_alert),
+	        super(getActivity().getResources().getDrawable(R.drawable.alert),
 	              text1,
 	              text2,
 	              requestCode);

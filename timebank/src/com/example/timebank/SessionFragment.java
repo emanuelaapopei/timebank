@@ -23,12 +23,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 
-public class SessionFragment extends Fragment {
+public class SessionFragment extends Fragment 
+							 implements AddSessionDialog.AddSessionListener{
 	private static final String TAG = "timeBank";
 			
 	private ProfilePictureView profilePictureView;
@@ -41,9 +43,11 @@ public class SessionFragment extends Fragment {
 	private Button addSession; 
 	
 	private GraphUser fbUser;	
+	private int sessionNumber;
 
 	public SessionFragment(String UserId) {
 		userId = UserId;
+		sessionNumber = 0;
 	}
 
 	@Override
@@ -70,7 +74,7 @@ public class SessionFragment extends Fragment {
 		listElements = new ArrayList<BaseListElement>();
 		
 		//read the elements from the database
-		updateSessionList();
+		readSessionList();
 		
 		// Set the list view adapter
 		listAdapter = new ActionListAdapter(getActivity(), R.id.session_list, listElements);
@@ -111,9 +115,9 @@ public class SessionFragment extends Fragment {
     public void addNewSession()
     {
     	DialogFragment newFragment = new AddSessionDialog();
+    	newFragment.setTargetFragment(this, 0);
         newFragment.show(getFragmentManager(), "session");
         
-        updateView();
     }
     
     public void answerSession(ParseObject SessionParse)
@@ -122,7 +126,7 @@ public class SessionFragment extends Fragment {
         newFragment.show(getFragmentManager(), "answerSession");
     }
     
-    public void updateSessionList()
+    public void readSessionList()
     {
     	fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
 		
@@ -154,6 +158,7 @@ public class SessionFragment extends Fragment {
     	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +receiver+" "+hours);
     	            	//listElements.add(new SessionListElement(i, skill, default_string));
     	            	listAdapter.add(new SessionListElement(i, main_string, default_string, session));
+    	            	sessionNumber++;
     	            }
     	            
     	        } else {
@@ -180,6 +185,39 @@ public class SessionFragment extends Fragment {
     		Log.d(TAG, "Adapter is null");
     	}
     }
+    
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+		
+		Log.d(TAG, "inside onDialogPositiveClick");
+		
+		ParseObject session;
+		
+		AddSessionDialog addSessionDialog = (AddSessionDialog) dialog; 
+		
+		session = addSessionDialog.getSession();
+		
+		String skill = session.getString("Skill");
+    	String receiver = session.getString("Receiver");
+    	int hours = session.getInt("Hours");
+    	String status = session.getString("Status");
+    	
+    	String main_string = skill + " - " + status;
+    	String default_string = "to user " + receiver + " for " + hours +" hours";
+    	
+    	Log.d(TAG, "Adding new item with values:" + main_string + " " +receiver+" "+hours);
+    	//listElements.add(new SessionListElement(i, skill, default_string));
+    	listAdapter.add(new SessionListElement(sessionNumber, main_string, default_string, session));
+    	sessionNumber++;
+    	
+    	listAdapter.notifyDataSetChanged();
+	}
+
+    @Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		// TODO Auto-generated method stub
+		
+	}
     
     /**
      * Resets the view to the initial defaults.
@@ -273,4 +311,6 @@ public class SessionFragment extends Fragment {
 			
 		}
 	}
+
+	
 }

@@ -26,6 +26,8 @@ public class AddSessionDialog extends DialogFragment {
 	
 	private GraphUser fbUser;
 	
+	private ParseObject currentSession;
+	
 	private static final String TAG = "timeBank";
 	
 	/* The activity that creates an instance of this dialog fragment must
@@ -39,18 +41,14 @@ public class AddSessionDialog extends DialogFragment {
  // Use this instance of the interface to deliver action events
     AddSessionListener mListener;
     
- // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        // Verify that the host activity implements the callback interface
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         try {
-            // Instantiate the NoticeDialogListener so we can send events to the host
-            mListener = (AddSessionListener) activity;
+        	mListener = (AddSessionListener) getTargetFragment();
         } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString()
-                    + " must implement AddSessionListener");
+            throw new ClassCastException("Calling fragment must implement AddSessionListener interface");
         }
     }
 		
@@ -74,7 +72,7 @@ public class AddSessionDialog extends DialogFragment {
                    public void onClick(DialogInterface dialog, int id) {
                 	   
                 	   saveNewSession(dialog);
-                	   
+                	   //Log.d(TAG, "before calling onDialogPositiveClick");
                 	   mListener.onDialogPositiveClick(AddSessionDialog.this);                  
                    }
                })
@@ -126,6 +124,8 @@ public class AddSessionDialog extends DialogFragment {
 		
 		session.saveInBackground();
 		
+		currentSession = session;
+		
  	   /*if(valueView == null) Log.e(TAG, "NULL");
         else{
      	   Log.e(TAG,valueView.getText().toString());
@@ -134,4 +134,23 @@ public class AddSessionDialog extends DialogFragment {
         }*/	
 	}
 
+	public String getSkill()
+	{
+		return skill.getText().toString();
+	}
+	
+	public String getUser()
+	{
+		return user.getText().toString();
+	}
+	
+	public String getHours()
+	{
+		return hours.getText().toString();
+	}
+	
+	public ParseObject getSession()
+	{
+		return currentSession;
+	}
 }

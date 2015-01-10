@@ -1,8 +1,10 @@
 package com.example.timebank;
 
 import com.facebook.model.OpenGraphAction;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,18 +15,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
-import android.view.WindowManager;
-import android.widget.*;
 import com.facebook.*;
 import com.facebook.model.*;
-import com.facebook.widget.ProfilePictureView;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.*;
@@ -34,15 +29,10 @@ public class UserBoardFragment extends Fragment {
 
     private static final String TAG = "timeBank";
     private String userId;
-    private Uri photoUri;
-    private GraphUser fbUser;
-    private ImageView photoThumbnail;
-
     private ListView listView;
     private List<BaseListElement> listElements;
     private ActionListAdapter listAdapter = null;
 
-    private ProfilePictureView profilePictureView;
     private UserBoardActivity activity;
 
     public UserBoardFragment(String UserId) {
@@ -53,22 +43,23 @@ public class UserBoardFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = (UserBoardActivity) getActivity();
+        userId = ((TimeBankApplication) getActivity().getApplication()).getUserId();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_user_board, container, false);
-
+        
         // Find the list view
         listView = (ListView) view.findViewById(R.id.selection_list);
 
         // Set up the list view items, based on a list of
         listElements = new ArrayList<BaseListElement>();
         listElements.add(new SkillListElement(0));
-        listElements.add(new LocationListElement(1));
-        listElements.add(new PeopleListElement(2));
-        listElements.add(new PhotoListElement(3));
+        listElements.add(new MessagesListElement(1));
+        listElements.add(new SessionListElement(2));
+        listElements.add(new AlertListElement(3));
         listView.setAdapter(new ActionListAdapter(getActivity(), R.id.selection_list, listElements));
         return view;
     }
@@ -106,8 +97,6 @@ public class UserBoardFragment extends Fragment {
 
     private void startAlertActivity(int requestCode) {
         Intent intent = new Intent();
-
-        String userId = profilePictureView.getProfileId();
         Uri data = Uri.parse(userId);
         intent.setData(data);
         intent.setClass(getActivity(), AlertActivity.class);
@@ -116,8 +105,6 @@ public class UserBoardFragment extends Fragment {
 
     private void startSkillBoardActivity(int requestCode) {
         Intent intent = new Intent();
-
-        String userId = profilePictureView.getProfileId();
         Uri data = Uri.parse(userId);
         intent.setData(data);
         intent.setClass(getActivity(), SkillBoardActivity.class);
@@ -126,29 +113,26 @@ public class UserBoardFragment extends Fragment {
 
     private void startSessionActivity(int requestCode) {
         Intent intent = new Intent();
-
-        String userId = profilePictureView.getProfileId();
         Uri data = Uri.parse(userId);
         intent.setData(data);
         intent.setClass(getActivity(), SessionActivity.class);
         startActivity(intent);
     }
 
+    private void startMessagesActivity(int requestCode) {
+    	Toast.makeText(activity.getApplicationContext(), "INBOX ACTIVITY MISSING", 100).show();
+//        Intent intent = new Intent();
+//        Uri data = Uri.parse(userId);
+//        intent.setData(data);
+//        intent.setClass(getActivity(), SessionActivity.class);
+//        startActivity(intent);
+    }
+    
     private class SkillListElement extends BaseListElement {
-
-        private static final String FOOD_KEY = "food";
-        private static final String FOOD_URL_KEY = "food_url";
-
-        private final String[] skillChoices;
-        private final String[] foodUrls;
-        private String foodChoiceUrl = null;
-        private String skillChoice = null;
 
         public SkillListElement(int requestCode) {
             super(getActivity().getResources().getDrawable(R.drawable.add_skill),
-                   null,null,requestCode);
-            skillChoices = getActivity().getResources().getStringArray(R.array.skill_types);
-            foodUrls = getActivity().getResources().getStringArray(R.array.food_og_urls);
+                    null, null, requestCode);
         }
 
         @Override
@@ -165,76 +149,6 @@ public class UserBoardFragment extends Fragment {
             };
         }
 
-
-        @Override
-        protected void onSaveInstanceState(Bundle bundle) {
-            if (skillChoice != null && foodChoiceUrl != null) {
-                bundle.putString(FOOD_KEY, skillChoice);
-                bundle.putString(FOOD_URL_KEY, foodChoiceUrl);
-            }
-        }
-
-        @Override
-        protected boolean restoreState(Bundle savedState) {
-            String food = savedState.getString(FOOD_KEY);
-            String foodUrl = savedState.getString(FOOD_URL_KEY);
-            if (food != null && foodUrl != null) {
-                skillChoice = food;
-                foodChoiceUrl = foodUrl;
-                //setFoodText();
-                return true;
-            }
-            return false;
-        }
-
-        private void showMealOptions() {
-            String title = getActivity().getResources().getString(R.string.select_skill);
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(title).
-                    setCancelable(true).
-                    setItems(skillChoices, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            foodChoiceUrl = foodUrls[i];
-                            if (foodChoiceUrl.length() == 0) {
-                                getCustomFood();
-                            } else {
-                                skillChoice = skillChoices[i];
-                                //setFoodText();
-                                notifyDataChanged();
-                            }
-                        }
-                    });
-            builder.show();
-        }
-
-        private void getCustomFood() {
-            String title = getActivity().getResources().getString(R.string.enter_meal);
-            final EditText input = new EditText(getActivity());
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(title)
-                    .setCancelable(true)
-                    .setView(input)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            skillChoice = input.getText().toString();
-                            //setFoodText();
-                            notifyDataChanged();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                        }
-                    });
-            AlertDialog dialog = builder.create();
-            // always popup the keyboard when the alert dialog shows
-            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-            dialog.show();
-        }
-
         @Override
         protected void populateOGAction(OpenGraphAction action) {
             // TODO Auto-generated method stub
@@ -242,15 +156,15 @@ public class UserBoardFragment extends Fragment {
         }
     }
 
-    private class PeopleListElement extends BaseListElement {
+    private class SessionListElement extends BaseListElement {
 
         private static final String FRIENDS_KEY = "friends";
 
         private List<GraphUser> selectedUsers;
 
-        public PeopleListElement(int requestCode) {
+        public SessionListElement(int requestCode) {
             super(getActivity().getResources().getDrawable(R.drawable.add_session),
-                   null,null,requestCode);
+                    null, null, requestCode);
         }
 
         @Override
@@ -362,15 +276,13 @@ public class UserBoardFragment extends Fragment {
         }
     }
 
-    private class LocationListElement extends BaseListElement {
-
-        private static final String PLACE_KEY = "place";
+    private class MessagesListElement extends BaseListElement {
 
         private GraphPlace selectedPlace = null;
 
-        public LocationListElement(int requestCode) {
+        public MessagesListElement (int requestCode) {
             super(getActivity().getResources().getDrawable(R.drawable.add_messages),
-            		null,null,requestCode);
+                    null, null, requestCode);
         }
 
         @Override
@@ -380,7 +292,7 @@ public class UserBoardFragment extends Fragment {
                 public void onClick(View view) {
                     if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
-                        startSkillBoardActivity(getRequestCode());
+                        startMessagesActivity(getRequestCode());
                     } else {
                         //activity.showSettingsFragment();
                     }
@@ -391,7 +303,6 @@ public class UserBoardFragment extends Fragment {
         @Override
         protected void onActivityResult(Intent data) {
             selectedPlace = ((TimeBankApplication) getActivity().getApplication()).getSelectedPlace();
-            setPlaceText();
             notifyDataChanged();
         }
 
@@ -400,57 +311,13 @@ public class UserBoardFragment extends Fragment {
             if (selectedPlace != null) {
                 action.setPlace(selectedPlace);
             }
-        }
-
-        @Override
-        protected void onSaveInstanceState(Bundle bundle) {
-            if (selectedPlace != null) {
-                bundle.putString(PLACE_KEY, selectedPlace.getInnerJSONObject().toString());
-            }
-        }
-
-        @Override
-        protected boolean restoreState(Bundle savedState) {
-            String place = savedState.getString(PLACE_KEY);
-            if (place != null) {
-                try {
-                    selectedPlace = GraphObject.Factory.create(new JSONObject(place), GraphPlace.class);
-                    setPlaceText();
-                    return true;
-                } catch (JSONException e) {
-                    Log.e(TAG, "Unable to deserialize place.", e);
-                }
-            }
-            return false;
-        }
-
-        private void setPlaceText() {
-            String text = null;
-            if (selectedPlace != null) {
-                text = selectedPlace.getName();
-            }
-            if (text == null) {
-                text = getResources().getString(R.string.action_messages);
-            }
-            setText2(text);
-        }
-
+        }       
     }
 
-    private class PhotoListElement extends BaseListElement {
-        private static final int CAMERA = 0;
-        private static final int GALLERY = 1;
-        private static final String PHOTO_URI_KEY = "photo_uri";
-        private static final String TEMP_URI_KEY = "temp_uri";
-        private static final String FILE_PREFIX = "scrumptious_img_";
-        private static final String FILE_SUFFIX = ".jpg";
-
-        private Uri tempUri = null;
-
-        public PhotoListElement(int requestCode) {
+    private class AlertListElement extends BaseListElement {
+        public AlertListElement(int requestCode) {
             super(getActivity().getResources().getDrawable(R.drawable.add_alert),
                     null, null, requestCode);
-            photoUri = null;
         }
 
         @Override
@@ -468,56 +335,7 @@ public class UserBoardFragment extends Fragment {
         }
 
         @Override
-        protected void onActivityResult(Intent data) {
-            if (tempUri != null) {
-                photoUri = tempUri;
-            } else if (data != null) {
-                photoUri = data.getData();
-            }
-            setPhotoThumbnail();
-            setPhotoText();
-        }
-
-        private void setPhotoText() {
-            if (photoUri == null) {
-                setText2(getResources().getString(R.string.action_photo_default));
-            } else {
-                setText2(getResources().getString(R.string.action_photo_ready));
-            }
-        }
-
-        @Override
         protected void populateOGAction(OpenGraphAction action) {
-        }
-
-        @Override
-        protected void onSaveInstanceState(Bundle bundle) {
-            if (photoUri != null) {
-                bundle.putParcelable(PHOTO_URI_KEY, photoUri);
-            }
-            if (tempUri != null) {
-                bundle.putParcelable(TEMP_URI_KEY, tempUri);
-            }
-        }
-
-        @Override
-        protected boolean restoreState(Bundle savedState) {
-            photoUri = savedState.getParcelable(PHOTO_URI_KEY);
-            tempUri = savedState.getParcelable(TEMP_URI_KEY);
-            setPhotoText();
-            return true;
-        }
-
-
-        private void setPhotoThumbnail() {
-            photoThumbnail.setImageURI(photoUri);
-        }
-
-        private Uri getTempUri() {
-            String imgFileName = FILE_PREFIX + System.currentTimeMillis() + FILE_SUFFIX;
-            File image = new File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imgFileName);
-            return Uri.fromFile(image);
         }
     }
 
@@ -544,7 +362,7 @@ public class UserBoardFragment extends Fragment {
             BaseListElement listElement = listElements.get(position);
             if (listElement != null) {
                 view.setOnClickListener(listElement.getOnClickListener());
-                ImageView icon = (ImageView) view.findViewById(R.id.icon);              
+                ImageView icon = (ImageView) view.findViewById(R.id.icon);
                 if (icon != null) {
                     icon.setImageDrawable(listElement.getIcon());
                 }

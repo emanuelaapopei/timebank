@@ -3,15 +3,12 @@ package com.example.timebank;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -22,9 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.*;
-
 import com.facebook.*;
 import com.facebook.internal.Utility;
 import com.facebook.model.*;
@@ -34,12 +29,8 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,9 +40,6 @@ import java.util.List;
 public class HomeScreenFragment extends Fragment implements OnGestureListener {
 
     private static final String TAG = "HomeScreenFragment";
-    private static final String MEAL_OBJECT_TYPE = "fb_sample_scrumps:meal";
-    private static final String EAT_ACTION_TYPE = "fb_sample_scrumps:eat";
-    private static final String DEFAULT_ACTION_IMAGE_URL = "http://facebooksampleapp.com/scrumptious/static/images/logo.png";
     private static final String PENDING_ANNOUNCE_KEY = "pendingAnnounce";
     private static final Uri M_FACEBOOK_URL = Uri.parse("http://m.facebook.com");
     private static final int USER_GENERATED_MIN_SIZE = 480;
@@ -60,20 +48,25 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     private static final String PERMISSION = "publish_actions";
 
     GestureDetector detector;
-    private Button testButton;
-    private ListView listView;
-    private ProgressDialog progressDialog;
-    private List<BaseListElement> listElements;
+
     private ProfilePictureView profilePictureView;
+    private ImageView balanceIconView;
+    private TextView balanceValueView;
+    private View currentView;
+
+
+    private List<BaseListElement> listElements;
+    private Button addFeedButton;
+    private ListView listView;
+
+
     private boolean pendingAnnounce;
     private MainActivity activity;
     private Uri photoUri;
-    private ImageView photoThumbnail;
+
+    private ProgressDialog progressDialog;
 
     private GraphUser fbUser;
-    private View currentView;
-    private TextView balanceView;
-    
     private UiLifecycleHelper uiHelper;
     private Session.StatusCallback sessionCallback = new Session.StatusCallback() {
         @Override
@@ -121,57 +114,31 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        uiHelper.onResume();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.homescreen, container, false);
-        
+
         view.setOnTouchListener(new OnSwipeTouchListener(activity) {
             @Override
             public void onSwipeRight() {
-                Toast.makeText(activity.getApplicationContext(), "User Board", 100).show();
-                listView.setVisibility(View.VISIBLE);
-                WindowManager.LayoutParams windowAttr = activity.getWindow().getAttributes();
-                windowAttr.dimAmount = 1.0f;
-                activity.getWindow().setAttributes(windowAttr);                
-                
-       /*         listView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        listView.setVisibility(View.INVISIBLE);
-                    }
-                }, 3000);*/
+                startUserBoardActivity();
             }
 
             @Override
             public void onSwipeLeft() {
                 Toast.makeText(activity.getApplicationContext(), "Close board", 100).show();
-                listView.setVisibility(View.INVISIBLE);
             }
         });
 
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
         profilePictureView.setCropped(true);
-        testButton = (Button) view.findViewById(R.id.test_button);
+
+       //addFeedButton = (Button) view.findViewById(R.id.addfeed_button);
         listView = (ListView) view.findViewById(R.id.selection_list);
-        listView.setVisibility(View.INVISIBLE);
 
-        photoThumbnail = (ImageView) view.findViewById(R.id.selected_image);
-//        if (FacebookDialog.canPresentOpenGraphMessageDialog(activity)) {
-//            messageButton.setVisibility(View.VISIBLE);
-//        }
-
-        //Log.e(TAG, "before init in HomeScreen");
-        
-        balanceView = (TextView) view.findViewById(R.id.balanceAAA);
-        //balanceView.setText( "bla" );
+        balanceIconView = (ImageView) view.findViewById(R.id.balance_icon);
+        balanceValueView = (TextView) view.findViewById(R.id.balance_value);
         init(savedInstanceState);
-        
         return view;
     }
 
@@ -188,9 +155,6 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     @Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        for (BaseListElement listElement : listElements) {
-            listElement.onSaveInstanceState(bundle);
-        }
         bundle.putBoolean(PENDING_ANNOUNCE_KEY, pendingAnnounce);
         uiHelper.onSaveInstanceState(bundle);
     }
@@ -208,38 +172,22 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
         activity = null;
     }
 
-    /**
-     * Notifies that the session token has been updated.
-     */
-    private void tokenUpdated() {
-        if (pendingAnnounce) {
-            handleAnnounce(false);
-        }
-    }
-
     private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
         if (session != null && session.isOpened()) {
-            if (state.equals(SessionState.OPENED_TOKEN_UPDATED)) {
-                tokenUpdated();
-            } else {
-                makeMeRequest(session);
-            }
+            makeMeRequest(session);
+
         } else {
             profilePictureView.setProfileId(null);
         }
     }
 
     private void makeMeRequest(final Session session) {
-    	
-    	//Log.d(TAG, "Entered makeMeRequest");
-    	
         Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
             @Override
             public void onCompleted(GraphUser user, Response response) {
                 if (session == Session.getActiveSession()) {
                     if (user != null) {
                         profilePictureView.setProfileId(user.getId());
-                        
                         ((TimeBankApplication) getActivity().getApplication()).setUser(user);
                     }
                 }
@@ -258,248 +206,64 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     private void init(Bundle savedInstanceState) {
 //        testButton.setEnabled(false);
 
-    	//Log.d(TAG, "Entered init of HomeScreenFragment");
-    	
-        listElements = new ArrayList<BaseListElement>();
-        listElements.add(new SkillListElement(0));
-        listElements.add(new LocationListElement(1));
-        listElements.add(new PeopleListElement(2));
-        listElements.add(new PhotoListElement(3));
-
-        if (savedInstanceState != null) {
-            for (BaseListElement listElement : listElements) {
-                listElement.restoreState(savedInstanceState);
-            }
-            pendingAnnounce = savedInstanceState.getBoolean(PENDING_ANNOUNCE_KEY, false);
-        }
-
-        listView.setAdapter(new ActionListAdapter(getActivity(), R.id.selection_list, listElements));
 
         Session session = Session.getActiveSession();
         if (session != null && session.isOpened()) {
             makeMeRequest(session);
-            
             getBalanceFromDB();
         }
     }
-    
-    private void getBalanceFromDB()
-    {
-    	//Log.d(TAG, "Entered getBalanceFromDB");
-    	//check if the current user has balance in the database
-    	fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
-    	
-    	String firstName = fbUser.getFirstName();
-		String lastName = fbUser.getLastName();
-		final String username = firstName + " " + lastName;
-		
-		
-    	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-    	
-    	query.whereEqualTo("username", firstName + " " + lastName);
-    	query.findInBackground(new FindCallback<ParseObject>() {
-    	    public void done(List<ParseObject> userList, ParseException e) {
-    	        if (e == null) {
-    	            Log.d(TAG, "Retrieved " + userList.size() + " users");
-    	            int balance = 0;
-    	            
-    	            ParseObject userParse = new ParseObject("User");
-    	            if (userList.size() == 0)
-    	            {
-    	            	//user doesn't have balance - first time he logs in the app
-    	            	//must save a User with default 5h balance
-    	            	userParse.put("fbID", profilePictureView.getProfileId());
-    	            	userParse.put("username", username);
-    	            	userParse.put("balance", 5);
-    	            	
-    	            	userParse.saveInBackground();
-    	            	
-    	            	((TimeBankApplication) getActivity().getApplication()).setBalance(5);
-    	            	balance = 5;
-    	            }
-    	            else
-    	            {
-    	           		userParse = userList.get(0);
-	            		balance = userParse.getInt("balance");
-	            		Log.d(TAG, "balance from db=  " + balance);
-	            		((TimeBankApplication) getActivity().getApplication()).setBalance(balance);	            	
-    	            }
-    	            
-    	            //set the balance in GUI--keep this code here
-    	             Log.d(TAG, "new balance =  " + balance);
-    	            balanceView.setText( balance + "hrs" );
-    	        } else {
-    	            Log.d(TAG, "Error: " + e.getMessage());
-    	        }
-    	    }
-    	});
-    	
-    }
 
-    private void handleAnnounce(boolean isMessage) {
-        pendingAnnounce = false;
-        Session session = Session.getActiveSession();
 
-        // if we have a session, then use the graph API to directly publish, otherwise use
-        // the native open graph share dialog.
-        if (session != null && session.isOpened()) {
-            handleGraphApiAnnounce();
-        } else {
-            if (isMessage) {
-                handleNativeMessageAnnounce();
-            } else {
-                handleNativeShareAnnounce();
-            }
-        }
-    }
+    private void getBalanceFromDB() {
+        //Log.d(TAG, "Entered getBalanceFromDB");
+        //check if the current user has balance in the database
+        fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
 
-    private void handleGraphApiAnnounce() {
-        Session session = Session.getActiveSession();
+        String firstName = fbUser.getFirstName();
+        String lastName = fbUser.getLastName();
+        final String username = firstName + " " + lastName;
 
-        List<String> permissions = session.getPermissions();
-        if (!permissions.contains(PERMISSION)) {
-            pendingAnnounce = true;
-            requestPublishPermissions(session);
-            return;
-        }
 
-        // Show a progress dialog because sometimes the requests can take a while.
-        progressDialog = ProgressDialog.show(getActivity(), "", getActivity().getResources().getString(R.string.progress_dialog_text), true);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
 
-        // Run this in a background thread so we can process the list of responses and extract errors.
-        AsyncTask<Void, Void, List<Response>> task = new AsyncTask<Void, Void, List<Response>>() {
+        query.whereEqualTo("username", firstName + " " + lastName);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> userList, ParseException e) {
+                if (e == null) {
+                    Log.d(TAG, "Retrieved " + userList.size() + " users");
+                    int balance = 0;
 
-            @Override
-            protected List<Response> doInBackground(Void... voids) {
-                EatAction eatAction = createEatAction();
-                RequestBatch requestBatch = new RequestBatch();
-                String photoStagingUri = null;
+                    ParseObject userParse = new ParseObject("User");
+                    if (userList.size() == 0) {
+                        //user doesn't have balance - first time he logs in the app
+                        //must save a User with default 5h balance
+                        userParse.put("fbID", profilePictureView.getProfileId());
+                        userParse.put("username", username);
+                        userParse.put("balance", 5);
 
-                if (photoUri != null) {
-                    try {
-                        Pair<File, Integer> fileAndMinDimemsion = getImageFileAndMinDimension();
-                        if (fileAndMinDimemsion != null) {
-                            Request photoStagingRequest =
-                                    Request.newUploadStagingResourceWithImageRequest(Session.getActiveSession(),
-                                            fileAndMinDimemsion.first, null);
-                            photoStagingRequest.setBatchEntryName("photoStaging");
-                            requestBatch.add(photoStagingRequest);
-                            // Facebook SDK * pro-tip *
-                            // We can use the result from one request in the batch as the input to another request.
-                            // In this case, the result from the staging upload is "uri", which we will use as the
-                            // input into the "url" field for images on the open graph action below.
-                            photoStagingUri = "{result=photoStaging:$.uri}";
-                            eatAction.setImage(getImageListForAction(photoStagingUri,
-                                    fileAndMinDimemsion.second >= USER_GENERATED_MIN_SIZE));
-                        }
-                    } catch (FileNotFoundException e) {
-                        // NOOP - if we can't upload the image, just skip it for now
+                        userParse.saveInBackground();
+
+                        ((TimeBankApplication) getActivity().getApplication()).setBalance(5);
+                        balance = 5;
+                    } else {
+                        userParse = userList.get(0);
+                        balance = userParse.getInt("balance");
+                        Log.d(TAG, "balance from db=  " + balance);
+                        ((TimeBankApplication) getActivity().getApplication()).setBalance(balance);
                     }
+
+                    //set the balance in GUI--keep this code here
+                    Log.d(TAG, "new balance =  " + balance);
+                    balanceValueView.setText(balance + "hrs");
+                } else {
+                    Log.d(TAG, "Error: " + e.getMessage());
                 }
-                MealGraphObject meal = eatAction.getMeal();
-                if (meal.getCreateObject()) {
-                    Request createObjectRequest =  Request.newPostOpenGraphObjectRequest(Session.getActiveSession(), meal, null);
-                    createObjectRequest.setBatchEntryName("createObject");
-                    requestBatch.add(createObjectRequest);
-                    eatAction.setProperty("meal", "{result=createObject:$.id}");
-                }
-
-                Request request = Request.newPostOpenGraphActionRequest(Session.getActiveSession(), eatAction, null);
-                requestBatch.add(request);
-
-                return requestBatch.executeAndWait();
             }
+        });
 
-            @Override
-            protected void onPostExecute(List<Response> responses) {
-                // We only care about the last response, or the first one with an error.
-                Response finalResponse = null;
-                for (Response response : responses) {
-                    finalResponse = response;
-                    if (response != null && response.getError() != null) {
-                        break;
-                    }
-                }
-                onPostActionResponse(finalResponse);
-            }
-        };
-
-        task.execute();
     }
 
-    private void handleNativeShareAnnounce() {
-        FacebookDialog.OpenGraphActionDialogBuilder builder = createDialogBuilder();
-        if (builder.canPresent()) {
-            uiHelper.trackPendingDialogCall(builder.build().present());
-        } else {
-            // If we can't show the native open graph share dialog because the Facebook app
-            // does not support it, then show then settings fragment so the user can log in.
-            activity.showSettingsFragment();
-        }
-    }
-
-    private FacebookDialog.OpenGraphActionDialogBuilder createDialogBuilder() {
-        EatAction eatAction = createEatAction();
-
-        boolean userGenerated = false;
-        if (photoUri != null) {
-            String photoUriString = photoUri.toString();
-            Pair<File, Integer> fileAndMinDimemsion = getImageFileAndMinDimension();
-            userGenerated = fileAndMinDimemsion.second >= USER_GENERATED_MIN_SIZE;
-
-            // If we have a content: URI, we can just use that URI, otherwise we'll need to add it as an attachment.
-            if (fileAndMinDimemsion != null && photoUri.getScheme().startsWith("content")) {
-                eatAction.setImage(getImageListForAction(photoUriString, userGenerated));
-            }
-        }
-
-        FacebookDialog.OpenGraphActionDialogBuilder builder = new FacebookDialog.OpenGraphActionDialogBuilder(
-                getActivity(), eatAction, "meal")
-                .setFragment(HomeScreenFragment.this);
-
-        if (photoUri != null && !photoUri.getScheme().startsWith("content")) {
-            builder.setImageAttachmentFilesForAction(Arrays.asList(new File(photoUri.getPath())), userGenerated);
-        }
-
-        return builder;
-    }
-
-    private void handleNativeMessageAnnounce() {
-        FacebookDialog.OpenGraphMessageDialogBuilder builder = createMessageDialogBuilder();
-        if (builder.canPresent()) {
-            uiHelper.trackPendingDialogCall(builder.build().present());
-        } else {
-            // If we can't show the native open graph share dialog because the Messenger app
-            // does not support it, then show then settings fragment so the user can log in.
-            activity.showSettingsFragment();
-        }
-    }
-
-    private FacebookDialog.OpenGraphMessageDialogBuilder createMessageDialogBuilder() {
-        EatAction eatAction = createEatAction();
-
-        boolean userGenerated = false;
-        if (photoUri != null) {
-            String photoUriString = photoUri.toString();
-            Pair<File, Integer> fileAndMinDimemsion = getImageFileAndMinDimension();
-            userGenerated = fileAndMinDimemsion.second >= USER_GENERATED_MIN_SIZE;
-
-            // If we have a content: URI, we can just use that URI, otherwise we'll need to add it as an attachment.
-            if (fileAndMinDimemsion != null && photoUri.getScheme().startsWith("content")) {
-                eatAction.setImage(getImageListForAction(photoUriString, userGenerated));
-            }
-        }
-
-        FacebookDialog.OpenGraphMessageDialogBuilder builder = new FacebookDialog.OpenGraphMessageDialogBuilder(
-                getActivity(), eatAction, "meal")
-                .setFragment(HomeScreenFragment.this);
-
-        if (photoUri != null && !photoUri.getScheme().startsWith("content")) {
-            builder.setImageAttachmentFilesForAction(Arrays.asList(new File(photoUri.getPath())), userGenerated);
-        }
-
-        return builder;
-    }
 
     private Pair<File, Integer> getImageFileAndMinDimension() {
         File photoFile = null;
@@ -557,14 +321,6 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
 
     private List<JSONObject> getImageListForAction(String uri, boolean userGenerated) {
         return Arrays.asList(getImageObject(uri, userGenerated).getInnerJSONObject());
-    }
-
-    private EatAction createEatAction() {
-        EatAction eatAction = OpenGraphAction.Factory.createForPost(EatAction.class, EAT_ACTION_TYPE);
-        for (BaseListElement element : listElements) {
-            element.populateOGAction(eatAction);
-        }
-        return eatAction;
     }
 
     private void requestPublishPermissions(Session session) {
@@ -711,59 +467,21 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
                 .show();
     }
 
-    private void startPickerActivity(Uri data, int requestCode) {
+
+    private void startUserBoardActivity() {
         Intent intent = new Intent();
-        intent.setData(data);
-        intent.setClass(getActivity(), PickerActivity.class);
-        startActivityForResult(intent, requestCode);
-    }
+        String userId = profilePictureView.getProfileId();        
+        ((TimeBankApplication) getActivity().getApplication()).setUserId(userId);
+        
+        try {
+            Uri data = Uri.parse(userId);
+            intent.setData(data);
+            intent.setClass(getActivity(), UserBoardActivity.class);
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(activity.getApplicationContext(), e.toString(), 100).show();
+        }
 
-    private void startAlertActivity(int requestCode) {
-        Intent intent = new Intent();
-
-        String userId = profilePictureView.getProfileId();
-        Uri data = Uri.parse(userId);
-        intent.setData(data);
-        intent.setClass(getActivity(), AlertActivity.class);
-        startActivity(intent);
-    }
-
-    private void startSkillBoardActivity(int requestCode) {
-        Intent intent = new Intent();
-
-        String userId = profilePictureView.getProfileId();
-        Uri data = Uri.parse(userId);
-        intent.setData(data);
-        intent.setClass(getActivity(), SkillBoardActivity.class);
-        startActivity(intent);
-    }
-
-    private void startSessionActivity(int requestCode) {
-        Intent intent = new Intent();
-
-        String userId = profilePictureView.getProfileId();
-        Uri data = Uri.parse(userId);
-        intent.setData(data);
-        intent.setClass(getActivity(), SessionActivity.class);
-        startActivity(intent);
-    }
-
-    /**
-     * Interface representing the Meal Open Graph object.
-     */
-    private interface MealGraphObject extends OpenGraphObject {
-        public String getUrl();
-        public void setUrl(String url);
-        public String getId();
-        public void setId(String id);
-    }
-
-    /**
-     * Interface representing the Eat action.
-     */
-    private interface EatAction extends OpenGraphAction {
-        public MealGraphObject getMeal();
-        public void setMeal(MealGraphObject meal);
     }
 
     /**
@@ -771,514 +489,6 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
      */
     private interface PostResponse extends GraphObject {
         String getId();
-    }
-
-    private class SkillListElement extends BaseListElement {
-
-        private static final String FOOD_KEY = "food";
-        private static final String FOOD_URL_KEY = "food_url";
-
-        private final String[] skillChoices;
-        private final String[] foodUrls;
-        private String foodChoiceUrl = null;
-        private String skillChoice = null;
-
-        public SkillListElement(int requestCode) {
-            super(getActivity().getResources().getDrawable(R.drawable.add_skill),
-                    getActivity().getResources().getString(R.string.action_skill),
-                    null,
-                    requestCode);
-            skillChoices = getActivity().getResources().getStringArray(R.array.skill_types);
-            foodUrls = getActivity().getResources().getStringArray(R.array.food_og_urls);
-        }
-
-        @Override
-        protected View.OnClickListener getOnClickListener() {
-            return new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //showMealOptions();
-                    if (Session.getActiveSession() != null &&
-                            Session.getActiveSession().isOpened()) {
-                        startSkillBoardActivity(getRequestCode());
-                    } else {
-                        activity.showSettingsFragment();
-                    }
-                }
-            };
-        }
-
-        @Override
-        protected void populateOGAction(OpenGraphAction action) {
-            if (skillChoice != null && skillChoice.length() > 0) {
-                EatAction eatAction = action.cast(EatAction.class);
-                eatAction.setImageUrls(Arrays.asList(DEFAULT_ACTION_IMAGE_URL));
-                if (foodChoiceUrl != null && foodChoiceUrl.length() > 0) {
-                    MealGraphObject meal = GraphObject.Factory.create(MealGraphObject.class);
-                    meal.setUrl(foodChoiceUrl);
-                    eatAction.setMeal(meal);
-                } else {
-                    MealGraphObject meal = OpenGraphObject.Factory.createForPost(MealGraphObject.class, MEAL_OBJECT_TYPE);
-                    meal.setTitle(skillChoice);
-                    eatAction.setMeal(meal);
-                }
-            }
-        }
-
-        @Override
-        protected void onSaveInstanceState(Bundle bundle) {
-            if (skillChoice != null && foodChoiceUrl != null) {
-                bundle.putString(FOOD_KEY, skillChoice);
-                bundle.putString(FOOD_URL_KEY, foodChoiceUrl);
-            }
-        }
-
-        @Override
-        protected boolean restoreState(Bundle savedState) {
-            String food = savedState.getString(FOOD_KEY);
-            String foodUrl = savedState.getString(FOOD_URL_KEY);
-            if (food != null && foodUrl != null) {
-                skillChoice = food;
-                foodChoiceUrl = foodUrl;
-                setFoodText();
-                return true;
-            }
-            return false;
-        }
-
-        private void showMealOptions() {
-            String title = getActivity().getResources().getString(R.string.select_skill);
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(title).
-                    setCancelable(true).
-                    setItems(skillChoices, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            foodChoiceUrl = foodUrls[i];
-                            if (foodChoiceUrl.length() == 0) {
-                                getCustomFood();
-                            } else {
-                                skillChoice = skillChoices[i];
-                                setFoodText();
-                                notifyDataChanged();
-                            }
-                        }
-                    });
-            builder.show();
-        }
-
-        private void getCustomFood() {
-            String title = getActivity().getResources().getString(R.string.enter_meal);
-            final EditText input = new EditText(getActivity());
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(title)
-                    .setCancelable(true)
-                    .setView(input)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            skillChoice = input.getText().toString();
-                            setFoodText();
-                            notifyDataChanged();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                        }
-                    });
-            AlertDialog dialog = builder.create();
-            // always popup the keyboard when the alert dialog shows
-            dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-            dialog.show();
-        }
-
-        private void setFoodText() {
-            if (skillChoice != null && skillChoice.length() > 0) {
-                setText2(skillChoice);
-                testButton.setEnabled(true);
-            } else {
-                setText2(getActivity().getResources().getString(R.string.action_eating_default));
-                testButton.setEnabled(false);
-            }
-        }
-    }
-
-    private class PeopleListElement extends BaseListElement {
-
-        private static final String FRIENDS_KEY = "friends";
-
-        private List<GraphUser> selectedUsers;
-
-        public PeopleListElement(int requestCode) {
-            super(getActivity().getResources().getDrawable(R.drawable.add_session),
-                    getActivity().getResources().getString(R.string.action_people),
-                    null,
-                    requestCode);
-        }
-
-        @Override
-        protected View.OnClickListener getOnClickListener() {
-            return new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (Session.getActiveSession() != null &&
-                            Session.getActiveSession().isOpened()) {
-                        //startPickerActivity(PickerActivity.FRIEND_PICKER, getRequestCode());
-                        startSessionActivity(getRequestCode());
-                    } else {
-                        activity.showSettingsFragment();
-                    }
-                }
-            };
-        }
-
-        @Override
-        protected void onActivityResult(Intent data) {
-            selectedUsers = ((TimeBankApplication) getActivity().getApplication()).getSelectedUsers();
-            setUsersText();
-            notifyDataChanged();
-        }
-
-        @Override
-        protected void populateOGAction(OpenGraphAction action) {
-            if (selectedUsers != null) {
-                action.setTags(selectedUsers);
-            }
-        }
-
-        @Override
-        protected void onSaveInstanceState(Bundle bundle) {
-            if (selectedUsers != null) {
-                bundle.putByteArray(FRIENDS_KEY, getByteArray(selectedUsers));
-            }
-        }
-
-        @Override
-        protected boolean restoreState(Bundle savedState) {
-            byte[] bytes = savedState.getByteArray(FRIENDS_KEY);
-            if (bytes != null) {
-                selectedUsers = restoreByteArray(bytes);
-                setUsersText();
-                return true;
-            }
-            return false;
-        }
-
-        private void setUsersText() {
-            String text = null;
-            if (selectedUsers != null) {
-                if (selectedUsers.size() == 1) {
-                    text = String.format(getResources().getString(R.string.single_user_selected),
-                            selectedUsers.get(0).getName());
-                } else if (selectedUsers.size() == 2) {
-                    text = String.format(getResources().getString(R.string.two_users_selected),
-                            selectedUsers.get(0).getName(), selectedUsers.get(1).getName());
-                } else if (selectedUsers.size() > 2) {
-                    text = String.format(getResources().getString(R.string.multiple_users_selected),
-                            selectedUsers.get(0).getName(), (selectedUsers.size() - 1));
-                }
-            }
-            if (text == null) {
-                text = getResources().getString(R.string.action_people_default);
-            }
-            setText2(text);
-        }
-
-        private byte[] getByteArray(List<GraphUser> users) {
-            // convert the list of GraphUsers to a list of String where each element is
-            // the JSON representation of the GraphUser so it can be stored in a Bundle
-            List<String> usersAsString = new ArrayList<String>(users.size());
-
-            for (GraphUser user : users) {
-                usersAsString.add(user.getInnerJSONObject().toString());
-            }
-            try {
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                new ObjectOutputStream(outputStream).writeObject(usersAsString);
-                return outputStream.toByteArray();
-            } catch (IOException e) {
-                Log.e(TAG, "Unable to serialize users.", e);
-            }
-            return null;
-        }
-
-        private List<GraphUser> restoreByteArray(byte[] bytes) {
-            try {
-                @SuppressWarnings("unchecked")
-                List<String> usersAsString =
-                        (List<String>) (new ObjectInputStream(new ByteArrayInputStream(bytes))).readObject();
-                if (usersAsString != null) {
-                    List<GraphUser> users = new ArrayList<GraphUser>(usersAsString.size());
-                    for (String user : usersAsString) {
-                        GraphUser graphUser = GraphObject.Factory
-                                .create(new JSONObject(user), GraphUser.class);
-                        users.add(graphUser);
-                    }
-                    return users;
-                }
-            } catch (ClassNotFoundException e) {
-                Log.e(TAG, "Unable to deserialize users.", e);
-            } catch (IOException e) {
-                Log.e(TAG, "Unable to deserialize users.", e);
-            } catch (JSONException e) {
-                Log.e(TAG, "Unable to deserialize users.", e);
-            }
-            return null;
-        }
-    }
-
-    private class LocationListElement extends BaseListElement {
-
-        private static final String PLACE_KEY = "place";
-
-        private GraphPlace selectedPlace = null;
-
-        public LocationListElement(int requestCode) {
-            super(getActivity().getResources().getDrawable(R.drawable.add_messages),
-                    getActivity().getResources().getString(R.string.action_messages),
-                    null,
-                    requestCode);
-        }
-
-        @Override
-        protected View.OnClickListener getOnClickListener() {
-            return new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (Session.getActiveSession() != null &&
-                            Session.getActiveSession().isOpened()) {
-                        //startPickerActivity(PickerActivity.PLACE_PICKER, getRequestCode());
-                        startSkillBoardActivity(getRequestCode());
-                    } else {
-                        activity.showSettingsFragment();
-                    }
-                }
-            };
-        }
-
-        @Override
-        protected void onActivityResult(Intent data) {
-            selectedPlace = ((TimeBankApplication) getActivity().getApplication()).getSelectedPlace();
-            setPlaceText();
-            notifyDataChanged();
-        }
-
-        @Override
-        protected void populateOGAction(OpenGraphAction action) {
-            if (selectedPlace != null) {
-                action.setPlace(selectedPlace);
-            }
-        }
-
-        @Override
-        protected void onSaveInstanceState(Bundle bundle) {
-            if (selectedPlace != null) {
-                bundle.putString(PLACE_KEY, selectedPlace.getInnerJSONObject().toString());
-            }
-        }
-
-        @Override
-        protected boolean restoreState(Bundle savedState) {
-            String place = savedState.getString(PLACE_KEY);
-            if (place != null) {
-                try {
-                    selectedPlace = GraphObject.Factory
-                            .create(new JSONObject(place), GraphPlace.class);
-                    setPlaceText();
-                    return true;
-                } catch (JSONException e) {
-                    Log.e(TAG, "Unable to deserialize place.", e);
-                }
-            }
-            return false;
-        }
-
-        private void setPlaceText() {
-            String text = null;
-            if (selectedPlace != null) {
-                text = selectedPlace.getName();
-            }
-            if (text == null) {
-                text = getResources().getString(R.string.action_messages);
-            }
-            setText2(text);
-        }
-
-    }
-
-    private class PhotoListElement extends BaseListElement {
-        private static final int CAMERA = 0;
-        private static final int GALLERY = 1;
-        private static final String PHOTO_URI_KEY = "photo_uri";
-        private static final String TEMP_URI_KEY = "temp_uri";
-        private static final String FILE_PREFIX = "scrumptious_img_";
-        private static final String FILE_SUFFIX = ".jpg";
-
-        private Uri tempUri = null;
-
-        public PhotoListElement(int requestCode) {
-            super(getActivity().getResources().getDrawable(R.drawable.add_alert),
-                    getActivity().getResources().getString(R.string.action_alert),
-                    null,
-                    requestCode);
-            photoUri = null;
-        }
-
-        @Override
-        protected View.OnClickListener getOnClickListener() {
-            return new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //showPhotoChoice();
-                    if (Session.getActiveSession() != null &&
-                            Session.getActiveSession().isOpened()) {
-                        //startPickerActivity(PickerActivity.PLACE_PICKER, getRequestCode());
-                        startAlertActivity(getRequestCode());
-                    } else {
-                        activity.showSettingsFragment();
-                    }
-                }
-            };
-        }
-
-        @Override
-        protected void onActivityResult(Intent data) {
-            if (tempUri != null) {
-                photoUri = tempUri;
-            } else if (data != null) {
-                photoUri = data.getData();
-            }
-            setPhotoThumbnail();
-            setPhotoText();
-        }
-
-        @Override
-        protected void populateOGAction(OpenGraphAction action) {
-        }
-
-        @Override
-        protected void onSaveInstanceState(Bundle bundle) {
-            if (photoUri != null) {
-                bundle.putParcelable(PHOTO_URI_KEY, photoUri);
-            }
-            if (tempUri != null) {
-                bundle.putParcelable(TEMP_URI_KEY, tempUri);
-            }
-        }
-
-        @Override
-        protected boolean restoreState(Bundle savedState) {
-            photoUri = savedState.getParcelable(PHOTO_URI_KEY);
-            tempUri = savedState.getParcelable(TEMP_URI_KEY);
-            setPhotoText();
-            return true;
-        }
-
-        private void showPhotoChoice() {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            CharSequence camera = getResources().getString(R.string.action_photo_camera);
-            CharSequence gallery = getResources().getString(R.string.action_photo_gallery);
-            builder.setCancelable(true).
-                    setItems(new CharSequence[]{camera, gallery}, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (i == CAMERA) {
-                                startCameraActivity();
-                            } else if (i == GALLERY) {
-                                startGalleryActivity();
-                            }
-                        }
-                    });
-            builder.show();
-        }
-
-        private void setPhotoText() {
-            if (photoUri == null) {
-                setText2(getResources().getString(R.string.action_photo_default));
-            } else {
-                setText2(getResources().getString(R.string.action_photo_ready));
-            }
-        }
-
-        private void setPhotoThumbnail() {
-            photoThumbnail.setImageURI(photoUri);
-        }
-
-        private void startCameraActivity() {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            tempUri = getTempUri();
-            if (tempUri != null) {
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
-            }
-            startActivityForResult(intent, getRequestCode());
-        }
-
-        private void startGalleryActivity() {
-            tempUri = null;
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            String selectPicture = getResources().getString(R.string.select_picture);
-            startActivityForResult(Intent.createChooser(intent, selectPicture), getRequestCode());
-        }
-
-        private Uri getTempUri() {
-            String imgFileName = FILE_PREFIX + System.currentTimeMillis() + FILE_SUFFIX;
-
-            // Note: on an emulator, you might need to create the "Pictures" directory in /mnt/sdcard first
-            //       % adb shell
-            //       % mkdir /mnt/sdcard/Pictures
-            File image = new File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), imgFileName);
-            return Uri.fromFile(image);
-        }
-    }
-
-    private class ActionListAdapter extends ArrayAdapter<BaseListElement> {
-        private List<BaseListElement> listElements;
-
-        public ActionListAdapter(Context context, int resourceId, List<BaseListElement> listElements) {
-            super(context, resourceId, listElements);
-            this.listElements = listElements;
-            for (int i = 0; i < listElements.size(); i++) {
-                listElements.get(i).setAdapter(this);
-            }
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = convertView;
-            if (view == null) {
-                LayoutInflater inflater =
-                        (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.listitem, null);
-            }
-
-            BaseListElement listElement = listElements.get(position);
-            if (listElement != null) {
-                view.setOnClickListener(listElement.getOnClickListener());
-                ImageView icon = (ImageView) view.findViewById(R.id.icon);
-                TextView text1 = (TextView) view.findViewById(R.id.text1);
-                TextView text2 = (TextView) view.findViewById(R.id.text2);
-                if (icon != null) {
-                    icon.setImageDrawable(listElement.getIcon());
-                }
-                if (text1 != null) {
-                    text1.setText(listElement.getText1());
-                }
-                if (text2 != null) {
-                    if (listElement.getText2() != null) {
-                        text2.setVisibility(View.VISIBLE);
-                        text2.setText(listElement.getText2());
-                    } else {
-                        text2.setVisibility(View.GONE);
-                    }
-                }
-            }
-            return view;
-        }
-
     }
 
     @Override
@@ -1317,5 +527,11 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
                            float velocityY) {
         // TODO Auto-generated method stub
         return false;
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        uiHelper.onResume();
     }
 }

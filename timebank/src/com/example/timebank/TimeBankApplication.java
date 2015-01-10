@@ -14,11 +14,11 @@ public class TimeBankApplication extends Application {
     private GraphPlace selectedPlace;
     private GraphUser fbUser;
     private int balance;
-
+    private String userId;
+    
     public List<GraphUser> getSelectedUsers() {
         return selectedUsers;
     }
-
     public void setSelectedUsers(List<GraphUser> users) {
         selectedUsers = users;
     }
@@ -26,7 +26,6 @@ public class TimeBankApplication extends Application {
     public GraphPlace getSelectedPlace() {
         return selectedPlace;
     }
-
     public void setSelectedPlace(GraphPlace place) {
         this.selectedPlace = place;
     }
@@ -35,17 +34,22 @@ public class TimeBankApplication extends Application {
 	{
 		return fbUser;		
 	}
-	
 	public void setUser(GraphUser User)
 	{
 		this.fbUser = User;
 	}
-	
+
+    public String getUserId() {
+        return userId;
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
 	public int getBalance()
 	{
 		return balance;
 	}
-	
 	public void setBalance(int newBalance)
 	{
 		balance = newBalance;

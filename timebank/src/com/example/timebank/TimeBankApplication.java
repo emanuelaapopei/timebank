@@ -1,8 +1,18 @@
 package com.example.timebank;
 
 import android.app.Application;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.facebook.model.GraphPlace;
 import com.facebook.model.GraphUser;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
+import com.parse.ParsePush;
+import com.parse.PushService;
+import com.parse.SaveCallback;
+
 import java.util.List;
 
 /**
@@ -54,4 +64,27 @@ public class TimeBankApplication extends Application {
 	{
 		balance = newBalance;
 	}
+	
+	@Override
+	  public void onCreate() {
+	    super.onCreate();
+
+		// Initialize the Parse SDK.
+	    Parse.initialize(this, "aGRzy0mD7CnzhIrseg4wWFpS2LjX2wyIXX0yh5Yu", "PMNgqCNC17R5XHYxK5wo2ENOeUsimtox4JcD40d5");
+	 	
+	 	ParsePush.subscribeInBackground("", new SaveCallback() {
+	 		  @Override
+	 		  public void done(ParseException e) {
+	 		    if (e == null) {
+	 		    	Toast toast = Toast.makeText(getApplicationContext(), R.string.alert_dialog_success, Toast.LENGTH_SHORT);
+					toast.show();
+	 		    } else {
+	 		    	e.printStackTrace();
+
+					Toast toast = Toast.makeText(getApplicationContext(), R.string.alert_dialog_failed, Toast.LENGTH_SHORT);
+					toast.show();
+	 		    }
+	 		  }
+	 		});
+	  }
 }

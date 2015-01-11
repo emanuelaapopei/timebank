@@ -5,6 +5,9 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,6 +37,7 @@ public class UserBoardFragment extends Fragment implements OnGestureListener{
     private List<BaseListElement> listElements;
     private UserBoardActivity activity;
     GestureDetector detector;
+    Timer timer = new Timer();;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,12 +52,22 @@ public class UserBoardFragment extends Fragment implements OnGestureListener{
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_user_board, container, false);
         view.setOnTouchListener(new OnSwipeTouchListener(activity) {
-            @Override
+        	 @Override
+             public void onSwipeRight() {
+                 activity.finish();
+             }
+        	@Override
             public void onSwipeLeft() {
                 activity.finish();
             }
-        });
-        
+        	
+        });        
+        timer.schedule(new TimerTask() {
+        	  @Override
+        	  public void run() {
+        		  activity.finish();
+        	  }
+        	}, 7000);
         // Find the list view
         listView = (ListView) view.findViewById(R.id.selection_list);
 

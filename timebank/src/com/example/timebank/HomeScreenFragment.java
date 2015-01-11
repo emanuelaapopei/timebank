@@ -248,7 +248,7 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
 
                     //set the balance in GUI--keep this code here
                     Log.d(TAG, "new balance =  " + balance);
-                    balanceValueView.setText(balance);
+                    balanceValueView.setText(String.valueOf(balance));
                 } else {
                     Log.d(TAG, "Error: " + e.getMessage());
                 }

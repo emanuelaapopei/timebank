@@ -50,7 +50,6 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     GestureDetector detector;
 
     private ProfilePictureView profilePictureView;
-    private ImageView balanceIconView;
     private TextView balanceValueView;
     private View currentView;
 
@@ -130,9 +129,8 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
 
        //addFeedButton = (Button) view.findViewById(R.id.addfeed_button);
         listView = (ListView) view.findViewById(R.id.selection_list);
-
-        balanceIconView = (ImageView) view.findViewById(R.id.balance_icon);
         balanceValueView = (TextView) view.findViewById(R.id.balance_value);
+//        balanceValueView.setText("7");
         init(savedInstanceState);
         return view;
     }
@@ -250,7 +248,7 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
 
                     //set the balance in GUI--keep this code here
                     Log.d(TAG, "new balance =  " + balance);
-                    balanceValueView.setText(balance + "hrs");
+                    balanceValueView.setText(balance);
                 } else {
                     Log.d(TAG, "Error: " + e.getMessage());
                 }

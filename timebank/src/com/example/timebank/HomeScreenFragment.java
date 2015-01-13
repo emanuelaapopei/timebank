@@ -182,6 +182,8 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
                     if (user != null) {
                         profilePictureView.setProfileId(user.getId());
                         ((TimeBankApplication) getActivity().getApplication()).setUser(user);
+                        
+                        getBalanceFromDB();
                     }
                 }
                 if (response.getError() != null) {
@@ -199,11 +201,9 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     private void init(Bundle savedInstanceState) {
 //        testButton.setEnabled(false);
 
-
         Session session = Session.getActiveSession();
         if (session != null && session.isOpened()) {
-            makeMeRequest(session);
-            getBalanceFromDB();
+            makeMeRequest(session);            
         }
     }
 

@@ -76,8 +76,8 @@ public class TimeBankApplication extends Application {
 	 		  @Override
 	 		  public void done(ParseException e) {
 	 		    if (e == null) {
-	 		    	Toast toast = Toast.makeText(getApplicationContext(), R.string.alert_dialog_success, Toast.LENGTH_SHORT);
-					toast.show();
+	 		    	//Toast toast = Toast.makeText(getApplicationContext(), R.string.alert_dialog_success, Toast.LENGTH_SHORT);
+					//toast.show();
 	 		    } else {
 	 		    	e.printStackTrace();
 

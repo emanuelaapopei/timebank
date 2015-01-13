@@ -2,6 +2,7 @@ package com.example.timebank;
 
 import com.facebook.model.GraphUser;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -72,6 +73,12 @@ public class AddSessionDialog extends DialogFragment {
                    public void onClick(DialogInterface dialog, int id) {
                 	   
                 	   saveNewSession(dialog);
+                	   
+                	   ParsePush push = new ParsePush();
+                	   push.setChannel("");
+                	   push.setMessage("A new session has been created.");
+                	   push.sendInBackground();
+                	   
                 	   //Log.d(TAG, "before calling onDialogPositiveClick");
                 	   mListener.onDialogPositiveClick(AddSessionDialog.this);                  
                    }

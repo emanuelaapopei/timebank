@@ -55,12 +55,14 @@
     <!-- Skill Board strings -->
     <string name="skill">Skill</string>
     <string name="skill_default">Edit skill</string>
-    <string name="add_skill">Add new skill</string>
+    <string name="add_skill">Add skill</string>
     <!-- Session strings -->
     <string name="session">Session</string>
     <string name="session_default">Edit session</string>
     <string name="add_session">Create new session</string>
 
+    <!-- Homescreen strings -->
+    <string name="new_ad">New ad</string>
     <!-- Dialog strings -->
     <string name="skill_input">Skill</string>
     <string name="user_input">User</string>
@@ -79,29 +81,9 @@
         <item>Advanced</item>
         <item>Expert</item>
     </string-array>
-    <string-array name="skill_types">
-        <item>Educative</item>
-        <item>Artistice</item>
-        <item>Inspirationale</item>
-        <item>Recreationale</item>
-        <item>Sportive</item>
-        <item>Utile</item>
-        <item>Recreationale</item>
-        <item>Diverse</item>
-        <item>Diverse2</item>
-    </string-array>
-
-    <string-array name="food_og_urls">
-        <item>http://samples.ogp.me/314483151980285</item><!-- Cheeseburger -->
-        <item>http://samples.ogp.me/314483221980278</item><!-- Pizza -->
-        <item>http://samples.ogp.me/314483265313607</item><!-- Hotdog -->
-        <item>http://samples.ogp.me/314483348646932</item><!-- Italian -->
-        <item>http://samples.ogp.me/314483375313596</item><!-- French -->
-        <item>http://samples.ogp.me/314483421980258</item><!-- Chinese -->
-        <item>http://samples.ogp.me/314483451980255</item><!-- Thai -->
-        <item>http://samples.ogp.me/314483491980251</item><!-- Indian -->
-        <item></item>
-    </string-array>
+    
+    <string name="alert_dialog_success">Succes</string>
+    <string name="alert_dialog_failed">Failed</string>
 
     <string name="title_activity_alert">Alert Activity</string>
     <string name="title_activity_skill_board">SkillBoard Activity</string>

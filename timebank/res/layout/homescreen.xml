@@ -52,7 +52,33 @@
             
 
         </RelativeLayout>
+        
     </LinearLayout>
+    
+    <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
+        
+        <Button android:id="@+id/new_ad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_ad"/>
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:fillViewport="true">
+                    
+            <com.example.timebank.FullListView
+                    android:id="@+id/feed_list"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:dividerHeight="@dimen/item_list_padding"
+                    android:divider="#00000000"/>                            
+           
+    	</ScrollView>
+    </LinearLayout>   
 
 </LinearLayout>
 

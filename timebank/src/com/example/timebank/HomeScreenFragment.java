@@ -3,6 +3,7 @@ package com.example.timebank;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Pair;
@@ -20,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+
 import com.facebook.*;
 import com.facebook.internal.Utility;
 import com.facebook.model.*;
@@ -31,6 +34,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import org.json.JSONObject;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,9 +59,10 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
 
 
     private List<BaseListElement> listElements;
-    private Button addFeedButton;
+    private ActionListAdapter listAdapter = null;
     private ListView listView;
 
+    private Button addFeedButton;
 
     private boolean pendingAnnounce;
     private MainActivity activity;
@@ -127,8 +132,23 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
         profilePictureView.setCropped(true);
 
-       //addFeedButton = (Button) view.findViewById(R.id.addfeed_button);
-        listView = (ListView) view.findViewById(R.id.selection_list);
+        addFeedButton = (Button) view.findViewById(R.id.new_ad);
+        addFeedButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	addNewFeedItem();
+            }
+        }); 
+        
+        listView = (ListView) view.findViewById(R.id.feed_list);
+        listElements = new ArrayList<BaseListElement>();
+        
+        readFeedList();
+        
+        // Set the list view adapter
+     	listAdapter = new ActionListAdapter(getActivity(), R.id.feed_list, listElements);
+     	listView.setAdapter(listAdapter);   	
+     	
+        
         balanceValueView = (TextView) view.findViewById(R.id.balance_value);
 //        balanceValueView.setText("7");
         init(savedInstanceState);
@@ -528,4 +548,118 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
         super.onResume();
         uiHelper.onResume();
     }
+    
+    public void addNewFeedItem()
+    {
+    	DialogFragment newFragment = new AddSkillDialog();
+    	newFragment.setTargetFragment(this, 0);
+        newFragment.show(getFragmentManager(), "skill");
+    }
+    
+    public void readFeedList()
+    {
+    	ParseQuery<ParseObject> query = ParseQuery.getQuery("Skill");
+		
+		query.findInBackground(new FindCallback<ParseObject>() {
+    	    public void done(List<ParseObject> skillList, ParseException e) {
+    	        if (e == null) {
+    	            Log.d(TAG, "Retrieved " + skillList.size() + " skills");
+    	            
+    	            ParseObject skillParse = new ParseObject("Skill");
+    	            for (int i = 0; i < skillList.size(); i++ )
+    	            {
+    	            	skillParse = skillList.get(i);
+    	            	String skill = skillParse.getString("Skill");
+    	            	String experience = skillParse.getString("Experience");
+    	            	String user = skillParse.getString("CreatedBy");
+    	            	
+    	            	String main_string = skill;
+    	            	String default_string = "Nivel: " + experience + ", User: " + user;
+    	            	
+    	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
+    	            	//listElements.add(new SessionListElement(i, skill, default_string));
+    	            	listAdapter.add(new FeedListElement(i, main_string, default_string, skillParse));
+    	            }
+    	            
+    	        } else {
+    	            Log.d(TAG, "Error: " + e.getMessage());
+    	        }
+    	    }
+    	});
+	
+    }
+    
+    private class ActionListAdapter extends ArrayAdapter<BaseListElement> {
+	    private List<BaseListElement> listElements;
+
+	    public ActionListAdapter(Context context, int resourceId, 
+	                             List<BaseListElement> listElements) {
+	        super(context, resourceId, listElements);
+	        this.listElements = listElements;
+	        // Set up as an observer for list item changes to
+	        // refresh the view.
+	        for (int i = 0; i < listElements.size(); i++) {
+	            listElements.get(i).setAdapter(this);
+	        }
+	    }
+
+	    @Override
+	    public View getView(int position, View convertView, ViewGroup parent) {
+	        View view = convertView;
+	        if (view == null) {
+	            LayoutInflater inflater =
+	                    (LayoutInflater) getActivity()
+	                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	            view = inflater.inflate(R.layout.listitem, null);
+	        }
+
+	        BaseListElement listElement = listElements.get(position);
+	        if (listElement != null) {
+	            view.setOnClickListener(listElement.getOnClickListener());
+	            ImageView icon = (ImageView) view.findViewById(R.id.icon);
+	            TextView text1 = (TextView) view.findViewById(R.id.text1);
+	            TextView text2 = (TextView) view.findViewById(R.id.text2);
+	            if (icon != null) {
+	                icon.setImageDrawable(listElement.getIcon());
+	            }
+	            if (text1 != null) {
+	                text1.setText(listElement.getText1());
+	            }
+	            if (text2 != null) {
+	                text2.setText(listElement.getText2());
+	            }
+	        }
+	        return view;
+	    }
+
+	}
+    
+    private class FeedListElement extends BaseListElement {
+
+		private ParseObject feedParse;
+	    public FeedListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
+	        super(getActivity().getResources().getDrawable(R.drawable.session),
+	              text1,//getActivity().getResources().getString(R.string.session),
+	              text2,//getActivity().getResources().getString(R.string.session_default),
+	              requestCode);
+	        
+	        feedParse = parseObj;
+	    }
+
+	    @Override
+	    protected View.OnClickListener getOnClickListener() {
+	        return new View.OnClickListener() {
+	            @Override
+	            public void onClick(View view) {
+	            	
+	            }
+	        };
+	    }
+
+		@Override
+		protected void populateOGAction(OpenGraphAction action) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
 }

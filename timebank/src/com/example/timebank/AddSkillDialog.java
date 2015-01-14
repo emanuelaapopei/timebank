@@ -21,7 +21,28 @@ public class AddSkillDialog extends DialogFragment {
 	
 	private GraphUser fbUser;
 	
+	private ParseObject currentSkill;
+	
 	private static final String TAG = "timeBank";
+	
+	public interface AddSkillListener {
+        public void onDialogPositiveClick(DialogFragment dialog);
+        public void onDialogNegativeClick(DialogFragment dialog);
+    }
+	
+	AddSkillListener mListener;
+	
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        try {
+        	mListener = (AddSkillListener) getTargetFragment();
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Calling fragment must implement AddSkillListener interface");
+        }
+    }
+	
 	@Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
@@ -39,11 +60,13 @@ public class AddSkillDialog extends DialogFragment {
                    public void onClick(DialogInterface dialog, int id) {
                        
                 	   saveNewSkill(dialog);
+                	   mListener.onDialogPositiveClick(AddSkillDialog.this); 
                    }
                })
                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // User cancelled the dialog
+                	   mListener.onDialogNegativeClick(AddSkillDialog.this);
                    }
                });
         // Create the AlertDialog object and return it
@@ -77,6 +100,13 @@ public class AddSkillDialog extends DialogFragment {
 		}
 		
 		skillParse.saveInBackground();
+		
+		currentSkill = skillParse;
+	}
+	
+	public ParseObject getSession()
+	{
+		return currentSkill;
 	}
 
 }

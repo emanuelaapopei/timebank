@@ -27,7 +27,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-public class SkillBoardFragment extends Fragment {
+public class SkillBoardFragment extends Fragment 
+								implements AddSkillDialog.AddSkillListener{
 	private static final String TAG = "timeBank";
 	
 	private ProfilePictureView profilePictureView;
@@ -40,9 +41,12 @@ public class SkillBoardFragment extends Fragment {
 	private GraphUser fbUser;
 	
 	private Button addSkill; 
+	
+	private int skillNumber;
 
 	public SkillBoardFragment(String UserId) {
 		userId = UserId;
+		skillNumber = 0;
 	}
 
 	@Override
@@ -109,6 +113,7 @@ public class SkillBoardFragment extends Fragment {
     public void addNewSkill()
     {
     	DialogFragment newFragment = new AddSkillDialog();
+    	newFragment.setTargetFragment(this, 0);
         newFragment.show(getFragmentManager(), "skill");
     }
     
@@ -140,6 +145,7 @@ public class SkillBoardFragment extends Fragment {
     	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
     	            	//listElements.add(new SessionListElement(i, skill, default_string));
     	            	listAdapter.add(new SkillListElement(i, main_string, default_string, skillParse));
+    	            	skillNumber++;
     	            }
     	            
     	        } else {
@@ -245,5 +251,35 @@ public class SkillBoardFragment extends Fragment {
 			// TODO Auto-generated method stub
 			
 		}
+	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		ParseObject skillParse;
+		
+		AddSkillDialog addSkillDialog = (AddSkillDialog) dialog; 
+		
+		skillParse = addSkillDialog.getSession();
+		
+		String skill = skillParse.getString("Skill");
+    	String experience = skillParse.getString("Experience");
+    	
+    	String main_string = skill;
+    	String default_string = "Nivel: " + experience;
+    	
+    	//Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
+    	
+		
+		listAdapter.add(new SkillListElement(skillNumber, main_string, default_string, skillParse));
+    	skillNumber++;
+    	
+    	listAdapter.notifyDataSetChanged();
+		
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		// TODO Auto-generated method stub
+		
 	}
 }

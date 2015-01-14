@@ -41,7 +41,9 @@ import java.util.List;
 /**
  * Fragment that represents the main home screen for Time Bank.
  */
-public class HomeScreenFragment extends Fragment implements OnGestureListener {
+public class HomeScreenFragment extends Fragment 
+								implements OnGestureListener 
+								, AddSkillDialog.AddSkillListener{
 
     private static final String TAG = "HomeScreenFragment";
     private static final String PENDING_ANNOUNCE_KEY = "pendingAnnounce";
@@ -63,6 +65,8 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     private ListView listView;
 
     private Button addFeedButton;
+    
+    private int itemsNumber;
 
     private boolean pendingAnnounce;
     private MainActivity activity;
@@ -72,6 +76,7 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
 
     private GraphUser fbUser;
     private UiLifecycleHelper uiHelper;
+    
     private Session.StatusCallback sessionCallback = new Session.StatusCallback() {
         @Override
         public void call(final Session session, final SessionState state, final Exception exception) {
@@ -115,6 +120,7 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
         uiHelper = new UiLifecycleHelper(getActivity(), sessionCallback);
         uiHelper.onCreate(savedInstanceState);
 
+        itemsNumber = 0;
     }
 
     @Override
@@ -579,6 +585,7 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
     	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
     	            	//listElements.add(new SessionListElement(i, skill, default_string));
     	            	listAdapter.add(new FeedListElement(i, main_string, default_string, skillParse));
+    	            	itemsNumber++;
     	            }
     	            
     	        } else {
@@ -661,5 +668,35 @@ public class HomeScreenFragment extends Fragment implements OnGestureListener {
 			// TODO Auto-generated method stub
 			
 		}
+	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		
+		ParseObject skillParse;
+		
+		AddSkillDialog addSkillDialog = (AddSkillDialog) dialog; 
+		
+		skillParse = addSkillDialog.getSession();
+		
+		String skill = skillParse.getString("Skill");
+    	String experience = skillParse.getString("Experience");
+    	
+    	String main_string = skill;
+    	String default_string = "Nivel: " + experience;
+    	
+    	//Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
+    	
+		
+		listAdapter.add(new FeedListElement(itemsNumber, main_string, default_string, skillParse));
+		itemsNumber++;
+    	
+    	listAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		// TODO Auto-generated method stub
+		
 	}
 }

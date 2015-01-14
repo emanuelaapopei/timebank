@@ -645,7 +645,7 @@ public class HomeScreenFragment extends Fragment
 
 		private ParseObject feedParse;
 	    public FeedListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
-	        super(getActivity().getResources().getDrawable(R.drawable.session),
+	        super(getActivity().getResources().getDrawable(R.drawable.person_icon),
 	              text1,//getActivity().getResources().getString(R.string.session),
 	              text2,//getActivity().getResources().getString(R.string.session_default),
 	              requestCode);

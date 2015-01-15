@@ -3,14 +3,14 @@
               xmlns:facebook="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@drawable/wallbalance"
+              android:background="@drawable/wallhome"
               android:orientation="vertical">
 
     <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
             android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:paddingRight="0dp"
             android:orientation="horizontal">
 
         <com.facebook.widget.ProfilePictureView
@@ -26,58 +26,59 @@
                 android:layout_height="fill_parent"
                 android:layout_marginTop="20dp"
                 android:paddingLeft="66dp"
-                android:paddingRight="36dp">
-  
+                android:paddingRight="0dp">
 
             <TextView
                     android:id="@+id/balance_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:paddingLeft="70dp"
-                    android:textColor="#D3D3D3"
+                    android:textColor="#3A7AAB"
                     android:textStyle="bold"
-                    android:textSize="30sp"/>     
-                    
-             <TextView
-                    android:id="@+id/notification_value"
+                    android:textSize="30sp"/>
+            <ImageButton
+                    android:id="@+id/filter_feed"
+                    android:background="@null"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="50dp"
-                    android:paddingLeft="60dp"
-                    android:textColor="#D3D3D3"
-                    android:textStyle="bold"
-                    android:textSize="30sp"/>                   
-            
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/filter"
+                    android:paddingLeft="65dp"/>
+            <ImageButton
+                    android:id="@+id/add_new"
+                    android:background="@null"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="66dp"
+                    android:src="@drawable/add"
+                    android:paddingLeft="96dp"/>
 
         </RelativeLayout>
-        
+
     </LinearLayout>
-    
+
     <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical">
-        
-        <Button android:id="@+id/new_ad"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/new_ad"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:orientation="vertical">
+
         <ScrollView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:fillViewport="true">
-                    
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fillViewport="true">
+
             <com.example.timebank.FullListView
                     android:id="@+id/feed_list"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
                     android:dividerHeight="@dimen/item_list_padding"
-                    android:divider="#00000000"/>                            
-           
-    	</ScrollView>
-    </LinearLayout>   
+                    android:divider="#00000000"/>
+
+        </ScrollView>
+    </LinearLayout>
 
 </LinearLayout>
 

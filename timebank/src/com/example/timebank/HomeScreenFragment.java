@@ -23,7 +23,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import com.facebook.*;
+import com.facebook.FacebookRequestError;
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.SessionDefaultAudience;
+import com.facebook.SessionState;
+import com.facebook.UiLifecycleHelper;
 import com.facebook.internal.Utility;
 import com.facebook.model.*;
 import com.facebook.widget.FacebookDialog;
@@ -41,42 +47,36 @@ import java.util.List;
 /**
  * Fragment that represents the main home screen for Time Bank.
  */
-public class HomeScreenFragment extends Fragment 
-								implements OnGestureListener 
-								, AddSkillDialog.AddSkillListener{
+public class HomeScreenFragment extends Fragment
+        implements OnGestureListener
+        , AddSkillDialog.AddSkillListener {
 
     private static final String TAG = "HomeScreenFragment";
     private static final String PENDING_ANNOUNCE_KEY = "pendingAnnounce";
     private static final Uri M_FACEBOOK_URL = Uri.parse("http://m.facebook.com");
     private static final int USER_GENERATED_MIN_SIZE = 480;
-
     private static final int REAUTH_ACTIVITY_CODE = 100;
     private static final String PERMISSION = "publish_actions";
-
-    GestureDetector detector;
+    private ProgressDialog progressDialog;
+    private UiLifecycleHelper uiHelper;
+    private GraphUser fbUser;
+    private boolean pendingAnnounce;
+    private MainActivity activity;
+    private Uri photoUri;
+    private GestureDetector detector;
 
     private ProfilePictureView profilePictureView;
     private TextView balanceValueView;
     private View currentView;
 
-
     private List<BaseListElement> listElements;
     private ActionListAdapter listAdapter = null;
     private ListView listView;
 
-    private Button addFeedButton;
-    
+    private ImageButton addFeedButton;
+    private ImageButton filterFeedButton;
     private int itemsNumber;
 
-    private boolean pendingAnnounce;
-    private MainActivity activity;
-    private Uri photoUri;
-
-    private ProgressDialog progressDialog;
-
-    private GraphUser fbUser;
-    private UiLifecycleHelper uiHelper;
-    
     private Session.StatusCallback sessionCallback = new Session.StatusCallback() {
         @Override
         public void call(final Session session, final SessionState state, final Exception exception) {
@@ -138,25 +138,31 @@ public class HomeScreenFragment extends Fragment
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
         profilePictureView.setCropped(true);
 
-        addFeedButton = (Button) view.findViewById(R.id.new_ad);
+        addFeedButton = (ImageButton) view.findViewById(R.id.add_new);
         addFeedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	addNewFeedItem();
+                addNewFeedItem();
             }
-        }); 
-        
+        });
+
+        filterFeedButton = (ImageButton) view.findViewById(R.id.filter_feed);
+        filterFeedButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Toast.makeText(activity.getApplicationContext(), "Filtering will be here soon", 100).show();
+            }
+        });
+
         listView = (ListView) view.findViewById(R.id.feed_list);
         listElements = new ArrayList<BaseListElement>();
-        
+
         readFeedList();
-        
+
         // Set the list view adapter
-     	listAdapter = new ActionListAdapter(getActivity(), R.id.feed_list, listElements);
-     	listView.setAdapter(listAdapter);   	
-     	
-        
+        listAdapter = new ActionListAdapter(getActivity(), R.id.feed_list, listElements);
+        listView.setAdapter(listAdapter);
+
+
         balanceValueView = (TextView) view.findViewById(R.id.balance_value);
-//        balanceValueView.setText("7");
         init(savedInstanceState);
         return view;
     }
@@ -208,7 +214,7 @@ public class HomeScreenFragment extends Fragment
                     if (user != null) {
                         profilePictureView.setProfileId(user.getId());
                         ((TimeBankApplication) getActivity().getApplication()).setUser(user);
-                        
+
                         getBalanceFromDB();
                     }
                 }
@@ -229,13 +235,12 @@ public class HomeScreenFragment extends Fragment
 
         Session session = Session.getActiveSession();
         if (session != null && session.isOpened()) {
-            makeMeRequest(session);            
+            makeMeRequest(session);
         }
     }
 
 
     private void getBalanceFromDB() {
-        //Log.d(TAG, "Entered getBalanceFromDB");
         //check if the current user has balance in the database
         fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
 
@@ -489,9 +494,9 @@ public class HomeScreenFragment extends Fragment
 
     private void startUserBoardActivity() {
         Intent intent = new Intent();
-        String userId = profilePictureView.getProfileId();        
+        String userId = profilePictureView.getProfileId();
         ((TimeBankApplication) getActivity().getApplication()).setUserId(userId);
-        
+
         try {
             Uri data = Uri.parse(userId);
             intent.setData(data);
@@ -548,155 +553,153 @@ public class HomeScreenFragment extends Fragment
         // TODO Auto-generated method stub
         return false;
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
         uiHelper.onResume();
     }
-    
-    public void addNewFeedItem()
-    {
-    	DialogFragment newFragment = new AddSkillDialog();
-    	newFragment.setTargetFragment(this, 0);
+
+    public void addNewFeedItem() {
+        DialogFragment newFragment = new AddSkillDialog();
+        newFragment.setTargetFragment(this, 0);
         newFragment.show(getFragmentManager(), "skill");
     }
-    
-    public void readFeedList()
-    {
-    	ParseQuery<ParseObject> query = ParseQuery.getQuery("Skill");
-		
-		query.findInBackground(new FindCallback<ParseObject>() {
-    	    public void done(List<ParseObject> skillList, ParseException e) {
-    	        if (e == null) {
-    	            Log.d(TAG, "Retrieved " + skillList.size() + " skills");
-    	            
-    	            ParseObject skillParse = new ParseObject("Skill");
-    	            for (int i = 0; i < skillList.size(); i++ )
-    	            {
-    	            	skillParse = skillList.get(i);
-    	            	String skill = skillParse.getString("Skill");
-    	            	String experience = skillParse.getString("Experience");
-    	            	String user = skillParse.getString("CreatedBy");
-    	            	
-    	            	String main_string = skill;
-    	            	String default_string = "Nivel: " + experience + ", User: " + user;
-    	            	
-    	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
-    	            	//listElements.add(new SessionListElement(i, skill, default_string));
-    	            	listAdapter.add(new FeedListElement(i, main_string, default_string, skillParse));
-    	            	itemsNumber++;
-    	            }
-    	            
-    	        } else {
-    	            Log.d(TAG, "Error: " + e.getMessage());
-    	        }
-    	    }
-    	});
-	
+
+    public void readFeedList() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Skill");
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> skillList, ParseException e) {
+                if (e == null) {
+                    Log.d(TAG, "Retrieved " + skillList.size() + " skills");
+
+                    ParseObject skillParse = new ParseObject("Skill");
+                    for (int i = 0; i < skillList.size(); i++) {
+                        skillParse = skillList.get(i);
+                        String skill = skillParse.getString("Skill");
+                        String experience = skillParse.getString("Experience");
+                        String user = skillParse.getString("CreatedBy");
+
+                        String main_string = skill;
+                        String default_string = "Nivel: " + experience + ", User: " + user;
+
+                        Log.d(TAG, "Adding new item with values:" + main_string + " " + default_string);
+                        //listElements.add(new SessionListElement(i, skill, default_string));
+                        listAdapter.add(new FeedListElement(i, main_string, default_string, skillParse));
+                        itemsNumber++;
+                    }
+
+                } else {
+                    Log.d(TAG, "Error: " + e.getMessage());
+                }
+            }
+        });
+
     }
-    
+
     private class ActionListAdapter extends ArrayAdapter<BaseListElement> {
-	    private List<BaseListElement> listElements;
+        private List<BaseListElement> listElements;
 
-	    public ActionListAdapter(Context context, int resourceId, 
-	                             List<BaseListElement> listElements) {
-	        super(context, resourceId, listElements);
-	        this.listElements = listElements;
-	        // Set up as an observer for list item changes to
-	        // refresh the view.
-	        for (int i = 0; i < listElements.size(); i++) {
-	            listElements.get(i).setAdapter(this);
-	        }
-	    }
+        public ActionListAdapter(Context context, int resourceId,
+                                 List<BaseListElement> listElements) {
+            super(context, resourceId, listElements);
+            this.listElements = listElements;
+            // Set up as an observer for list item changes to
+            // refresh the view.
+            for (int i = 0; i < listElements.size(); i++) {
+                listElements.get(i).setAdapter(this);
+            }
+        }
 
-	    @Override
-	    public View getView(int position, View convertView, ViewGroup parent) {
-	        View view = convertView;
-	        if (view == null) {
-	            LayoutInflater inflater =
-	                    (LayoutInflater) getActivity()
-	                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	            view = inflater.inflate(R.layout.listitem, null);
-	        }
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (view == null) {
+                LayoutInflater inflater =
+                        (LayoutInflater) getActivity()
+                                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.listitem, null);
+            }
 
-	        BaseListElement listElement = listElements.get(position);
-	        if (listElement != null) {
-	            view.setOnClickListener(listElement.getOnClickListener());
-	            ImageView icon = (ImageView) view.findViewById(R.id.icon);
-	            TextView text1 = (TextView) view.findViewById(R.id.text1);
-	            TextView text2 = (TextView) view.findViewById(R.id.text2);
-	            if (icon != null) {
-	                icon.setImageDrawable(listElement.getIcon());
-	            }
-	            if (text1 != null) {
-	                text1.setText(listElement.getText1());
-	            }
-	            if (text2 != null) {
-	                text2.setText(listElement.getText2());
-	            }
-	        }
-	        return view;
-	    }
+            BaseListElement listElement = listElements.get(position);
+            if (listElement != null) {
+                view.setOnClickListener(listElement.getOnClickListener());
+                ImageView icon = (ImageView) view.findViewById(R.id.icon);
+                TextView text1 = (TextView) view.findViewById(R.id.text1);
+                TextView text2 = (TextView) view.findViewById(R.id.text2);
+                if (icon != null) {
+                    icon.setImageDrawable(listElement.getIcon());
+                }
+                if (text1 != null) {
+                    text1.setText(listElement.getText1());
+                }
+                if (text2 != null) {
+                    text2.setText(listElement.getText2());
+                }
+            }
+            return view;
+        }
 
-	}
-    
+    }
+
     private class FeedListElement extends BaseListElement {
 
-		private ParseObject feedParse;
-	    public FeedListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
-	        super(getActivity().getResources().getDrawable(R.drawable.person_icon),
-	              text1,//getActivity().getResources().getString(R.string.session),
-	              text2,//getActivity().getResources().getString(R.string.session_default),
-	              requestCode);
-	        
-	        feedParse = parseObj;
-	    }
+        private ParseObject feedParse;
 
-	    @Override
-	    protected View.OnClickListener getOnClickListener() {
-	        return new View.OnClickListener() {
-	            @Override
-	            public void onClick(View view) {
-	            	
-	            }
-	        };
-	    }
+        public FeedListElement(int requestCode, String text1, String text2, ParseObject parseObj) {
+            super(getActivity().getResources().getDrawable(R.drawable.person_icon),
+                    text1,//getActivity().getResources().getString(R.string.session),
+                    text2,//getActivity().getResources().getString(R.string.session_default),
+                    requestCode);
 
-		@Override
-		protected void populateOGAction(OpenGraphAction action) {
-			// TODO Auto-generated method stub
-			
-		}
-	}
+            feedParse = parseObj;
+        }
 
-	@Override
-	public void onDialogPositiveClick(DialogFragment dialog) {
-		
-		ParseObject skillParse;
-		
-		AddSkillDialog addSkillDialog = (AddSkillDialog) dialog; 
-		
-		skillParse = addSkillDialog.getSession();
-		
-		String skill = skillParse.getString("Skill");
-    	String experience = skillParse.getString("Experience");
-    	
-    	String main_string = skill;
-    	String default_string = "Nivel: " + experience;
-    	
-    	//Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
-    	
-		
-		listAdapter.add(new FeedListElement(itemsNumber, main_string, default_string, skillParse));
-		itemsNumber++;
-    	
-    	listAdapter.notifyDataSetChanged();
-	}
+        @Override
+        protected View.OnClickListener getOnClickListener() {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-	@Override
-	public void onDialogNegativeClick(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
-	}
+                }
+            };
+        }
+
+        @Override
+        protected void populateOGAction(OpenGraphAction action) {
+            // TODO Auto-generated method stub
+
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+
+        ParseObject skillParse;
+
+        AddSkillDialog addSkillDialog = (AddSkillDialog) dialog;
+
+        skillParse = addSkillDialog.getSession();
+
+        String skill = skillParse.getString("Skill");
+        String experience = skillParse.getString("Experience");
+
+        String main_string = skill;
+        String default_string = "Nivel: " + experience;
+
+        //Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
+
+
+        listAdapter.add(new FeedListElement(itemsNumber, main_string, default_string, skillParse));
+        itemsNumber++;
+
+        listAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        // TODO Auto-generated method stub
+
+    }
 }

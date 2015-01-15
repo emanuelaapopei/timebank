@@ -37,7 +37,7 @@
                    android:layout_height="wrap_content"
                    android:layout_marginTop="66dp"
                    android:src="@drawable/add"
-                   android:paddingLeft="96dp"/>
+                   android:paddingLeft="95dp"/>
 
        </RelativeLayout>
    </LinearLayout>

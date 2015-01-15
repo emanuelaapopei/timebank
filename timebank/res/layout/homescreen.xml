@@ -41,9 +41,9 @@
                     android:background="@null"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="10dp"
                     android:src="@drawable/filter"
-                    android:paddingLeft="65dp"/>
+                    android:paddingLeft="63dp"/>
             <ImageButton
                     android:id="@+id/add_new"
                     android:background="@null"
@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="66dp"
                     android:src="@drawable/add"
-                    android:paddingLeft="96dp"/>
+                    android:paddingLeft="95dp"/>
 
         </RelativeLayout>
     </LinearLayout>

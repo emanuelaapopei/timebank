@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -32,16 +33,13 @@ public class SkillBoardFragment extends Fragment
 	private static final String TAG = "timeBank";
 	
 	private ProfilePictureView profilePictureView;
+    private GraphUser fbUser;
 	private String userId;
 	
 	private ListView listView;
 	private List<BaseListElement> listElements;
 	private ActionListAdapter listAdapter = null;
-	
-	private GraphUser fbUser;
-	
-	private Button addSkill; 
-	
+	private ImageButton addSkill;
 	private int skillNumber;
 
 	public SkillBoardFragment(String UserId) {
@@ -58,7 +56,7 @@ public class SkillBoardFragment extends Fragment
 		profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
 		profilePictureView.setProfileId(userId);
 		
-		addSkill = (Button) view.findViewById(R.id.test_button); 
+		addSkill = (ImageButton) view.findViewById(R.id.add_skill);
 		addSkill.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
             	addNewSkill();

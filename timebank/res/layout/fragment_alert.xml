@@ -5,14 +5,14 @@
         xmlns:facebook="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/wallmenu"
+        android:background="@drawable/wallalert"
         android:orientation="vertical">
 
     <LinearLayout
-             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"
             android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:paddingRight="0dp"
             android:orientation="horizontal">
 
         <com.facebook.widget.ProfilePictureView
@@ -22,18 +22,32 @@
                 android:layout_alignParentLeft="true"
                 android:layout_margin="10dp"
                 facebook:preset_size="normal"/>
+
+        <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="66dp"
+                android:paddingRight="0dp">
+
+            <ImageButton
+                    android:id="@+id/add_alert"
+                    android:background="@null"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="66dp"
+                    android:src="@drawable/add"
+                    android:paddingLeft="96dp"/>
+
+        </RelativeLayout>
+
    </LinearLayout>
    
     <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="vertical">  
-     <Button
-         android:id="@+id/test_butto"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:text="@string/add_alert"/>
-     
+
     <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

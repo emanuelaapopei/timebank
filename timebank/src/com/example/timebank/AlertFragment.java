@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,15 +32,13 @@ public class AlertFragment extends Fragment {
 	private static final String TAG = "timeBank";
 	
 	private ProfilePictureView profilePictureView;
+    private GraphUser fbUser;
 	private String userId;
-	
-	private Button addAlert; 
-	
-	private ListView listView;
-	private List<BaseListElement> listElements;
-	private ActionListAdapter listAdapter = null;
-	
-	private GraphUser fbUser;
+
+    private List<BaseListElement> listElements;
+    private ActionListAdapter listAdapter = null;
+    private ListView listView;
+	private ImageButton addAlert;
 
 	public AlertFragment(String UserId) {
 		userId = UserId;
@@ -54,7 +53,7 @@ public class AlertFragment extends Fragment {
 		profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
 		profilePictureView.setProfileId(userId);
 		
-		addAlert = (Button) view.findViewById(R.id.test_butto); 
+		addAlert = (ImageButton) view.findViewById(R.id.add_alert);
 		addAlert.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
             	addNewAlert();

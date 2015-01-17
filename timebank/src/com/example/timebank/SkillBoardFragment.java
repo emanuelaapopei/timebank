@@ -136,10 +136,9 @@ public class SkillBoardFragment extends Fragment
     	            	skillParse = skillList.get(i);
     	            	String skill = skillParse.getString("Skill");
     	            	double skill_level = skillParse.getDouble("Experience");
-    	            	String experience = Double.toString(skill_level);
-    	            	
+    	              	            	
     	            	String main_string = skill;
-    	            	String default_string = "Level: " + experience;
+    	            	String default_string = Utils.getSkillLevel(skill_level);
     	            	
     	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
     	            	//listElements.add(new SessionListElement(i, skill, default_string));

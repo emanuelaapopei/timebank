@@ -114,21 +114,15 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:orientation="horizontal"
-              android:paddingTop="20dp" >
-
-              <!-- TextView
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:paddingLeft="10dp"
-                  android:paddingTop="20dp"
-                  android:text="@string/rating_input" /-->
+              android:paddingTop="15dp"
+               android:paddingBottom="5dp" >
 
               <RatingBar
                   android:id="@+id/ratingBar"
+                  android:progressDrawable="@drawable/ratingbar_session"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_gravity="center_horizontal"
-                  android:layout_marginLeft="20dp"
                   android:numStars="5" />
           </LinearLayout>
                                     

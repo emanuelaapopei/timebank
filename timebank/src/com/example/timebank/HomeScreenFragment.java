@@ -581,7 +581,7 @@ public class HomeScreenFragment extends Fragment
                         String user = skillParse.getString("CreatedBy");
 
                         String main_string = skill;
-                        String default_string = "Nivel: " + experience + ", User: " + user;
+                        String default_string = Utils.getSkillLevel(experience)+ ", User: " + user;
 
                         Log.d(TAG, "Adding new item with values:" + main_string + " " + default_string);
                         //listElements.add(new SessionListElement(i, skill, default_string));

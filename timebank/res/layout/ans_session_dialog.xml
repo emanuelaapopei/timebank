@@ -106,8 +106,7 @@
                    android:layout_weight="0.44"
                    android:inputType="text"
                    android:paddingTop="20dp"
-                   android:singleLine="false" />
-       
+                   android:singleLine="false" />       
           </LinearLayout>
           
           <LinearLayout
@@ -115,7 +114,7 @@
               android:layout_height="wrap_content"
               android:orientation="horizontal"
               android:paddingTop="15dp"
-               android:paddingBottom="5dp" >
+              android:paddingBottom="5dp" >
 
               <RatingBar
                   android:id="@+id/ratingBar"

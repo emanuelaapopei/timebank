@@ -56,6 +56,7 @@
     <string name="skill">Skill</string>
     <string name="skill_default">Edit skill</string>
     <string name="add_skill">Add skill</string>
+    <string name="update_skill">Update skill</string>
     <!-- Session strings -->
     <string name="session">Session</string>
     <string name="session_default">Edit session</string>

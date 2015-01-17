@@ -1,30 +1,27 @@
 package com.example.timebank;
-
 import com.facebook.model.GraphUser;
 import com.parse.ParseObject;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RatingBar;
 
 public class AddSkillDialog extends DialogFragment {
-	
-	private EditText skill;
-	private EditText experience;
 
+   	private EditText skill;
+    private RatingBar skill_level;
 	private View dialogView;
-	
 	private GraphUser fbUser;
-	
 	private ParseObject currentSkill;
-	
-	private static final String TAG = "timeBank";
-	
+
 	public interface AddSkillListener {
         public void onDialogPositiveClick(DialogFragment dialog);
         public void onDialogNegativeClick(DialogFragment dialog);
@@ -73,34 +70,27 @@ public class AddSkillDialog extends DialogFragment {
         return builder.create();
     }
 	
-	private void saveNewSkill(DialogInterface Dialog)
-	{
+	private void saveNewSkill(DialogInterface Dialog){
+
+        fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
+        String firstName = fbUser.getFirstName();
+        String lastName = fbUser.getLastName();
 		skill = (EditText) dialogView.findViewById(R.id.skill_from_skill);
-		experience = (EditText) dialogView.findViewById(R.id.experience_from_skill);
-		
-		fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
-		
-		String firstName = fbUser.getFirstName();
-		String lastName = fbUser.getLastName();
+		skill_level = (RatingBar) dialogView.findViewById(R.id.skill_level);
 	
-		ParseObject skillParse = new ParseObject("Skill");	
-		
-		if (skill != null)
-		{
+		ParseObject skillParse = new ParseObject("Skill");		
+		if (skill != null){
 			skillParse.put("Skill", skill.getText().toString());
 		}
-		if (experience != null)
-		{
-			skillParse.put("Experience", experience.getText().toString());
+		if (skill_level != null){
+			skillParse.put("Experience", skill_level.getRating());
 		}
 		
-		if (firstName != null && lastName != null)
-		{
+		if (firstName != null && lastName != null){
 			skillParse.put("CreatedBy", firstName + " " + lastName);
 		}
 		
 		skillParse.saveInBackground();
-		
 		currentSkill = skillParse;
 	}
 	

@@ -54,7 +54,6 @@ public class HomeScreenFragment extends Fragment
     private static final String TAG = "HomeScreenFragment";
     private static final String PENDING_ANNOUNCE_KEY = "pendingAnnounce";
     private static final Uri M_FACEBOOK_URL = Uri.parse("http://m.facebook.com");
-    private static final int USER_GENERATED_MIN_SIZE = 480;
     private static final int REAUTH_ACTIVITY_CODE = 100;
     private static final String PERMISSION = "publish_actions";
     private ProgressDialog progressDialog;
@@ -578,7 +577,7 @@ public class HomeScreenFragment extends Fragment
                     for (int i = 0; i < skillList.size(); i++) {
                         skillParse = skillList.get(i);
                         String skill = skillParse.getString("Skill");
-                        String experience = skillParse.getString("Experience");
+                        double experience = skillParse.getDouble("Experience");
                         String user = skillParse.getString("CreatedBy");
 
                         String main_string = skill;

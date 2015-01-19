@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TimeBank</string>
-    <!--<string name="app_id">233936543368280</string>-->
-    <string name="facebook_app_id">1554786971405181</string>
+    <string name="app_id">233936543368280</string>
+    <!-- <string name="facebook_app_id">1554786971405181</string> -->
     <string name="get_started">To get started, login using Facebook</string>
     <string name="action_skill">Add Skill</string>
 
@@ -57,15 +57,13 @@
     <string name="skill_default">Edit skill</string>
     <string name="add_skill">Add skill</string>
     <string name="update_skill">Update skill</string>
-    
     <!-- Session strings -->
     <string name="session">Session</string>
     <string name="session_default">Edit session</string>
     <string name="add_session">Create new session</string>
-    
+
     <!-- Homescreen strings -->
     <string name="new_ad">New ad</string>
-
     <!-- Dialog strings -->
     <string name="skill_input">Skill</string>
     <string name="user_input">User</string>

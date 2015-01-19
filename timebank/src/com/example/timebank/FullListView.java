@@ -34,7 +34,7 @@ public class FullListView extends ListView {
         for (int i = 0; i < count; i++) {
             View childView = adapter.getView(i, null, this);
             childView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            height += childView.getMeasuredHeight();
+            height += childView.getMeasuredHeight() + 20;
         }
         height += getDividerHeight() * (count - 1) + 100;
         setMeasuredDimension(width, height);

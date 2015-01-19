@@ -36,7 +36,7 @@ public class FullListView extends ListView {
             childView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             height += childView.getMeasuredHeight();
         }
-        height += getDividerHeight() * (count - 1);
+        height += getDividerHeight() * (count - 1) + 100;
         setMeasuredDimension(width, height);
     }
 }

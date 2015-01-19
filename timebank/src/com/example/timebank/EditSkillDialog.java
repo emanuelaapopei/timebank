@@ -22,6 +22,7 @@ public class EditSkillDialog extends DialogFragment {
 	private ParseObject currentSkill;
 	EditSkillListener mListener;
     int skillNr;
+    private GraphUser fbUser;
 	
 	public interface EditSkillListener {
         public void onDialogEditPositiveClick(DialogFragment dialog);
@@ -73,6 +74,7 @@ public class EditSkillDialog extends DialogFragment {
                    public void onClick(DialogInterface dialog, int id) {
                        
                 	   updateSkill(dialog);
+                	   addFeedItem();
                 	   mListener.onDialogEditPositiveClick(EditSkillDialog.this); 
                    }
                })
@@ -92,6 +94,23 @@ public class EditSkillDialog extends DialogFragment {
 			currentSkill.put("Experience", skill_level.getRating());
 		}		
 		currentSkill.saveInBackground();
+	}
+	
+	private void addFeedItem()
+	{
+		fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
+        String firstName = fbUser.getFirstName();
+        String lastName = fbUser.getLastName();
+        String skillStr = skill.getText().toString();
+        String experienceStr = Utils.getSkillLevel( skill_level.getRating());
+        
+        ParseObject feedItemParse = new ParseObject("FeedItem");	
+        
+        feedItemParse.put("Skill", skillStr);
+        feedItemParse.put("FeedItemText", firstName + " " + lastName + " este acum "
+        		+ experienceStr + ".");
+        feedItemParse.put("CreatedBy", firstName + " " + lastName);
+        feedItemParse.saveInBackground();
 	}
 	
 	

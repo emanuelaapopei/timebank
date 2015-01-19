@@ -1,42 +1,43 @@
 package com.example.timebank;
+
+import com.example.timebank.AddSkillDialog.AddSkillListener;
 import com.facebook.model.GraphUser;
 import com.parse.ParseObject;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RatingBar;
 
-public class AddSkillDialog extends DialogFragment {
-
-   	private EditText skill;
-    private RatingBar skill_level;
+public class AddFeedItemDialog extends DialogFragment{
+	//Members
+	private EditText skill;
+	private EditText feedItemText;
 	private View dialogView;
 	private GraphUser fbUser;
-	private ParseObject currentSkill, currentFeedItem;
-
-	public interface AddSkillListener {
+	private ParseObject currentFeedItem;
+	
+	//Interfaces
+	public interface AddFeedItemListener {
         public void onDialogPositiveClick(DialogFragment dialog);
         public void onDialogNegativeClick(DialogFragment dialog);
     }
 	
-	AddSkillListener mListener;
+	AddFeedItemListener mListener;
 	
+	//Methods
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         try {
-        	mListener = (AddSkillListener) getTargetFragment();
+        	mListener = (AddFeedItemListener) getTargetFragment();
         } catch (ClassCastException e) {
-            throw new ClassCastException("Calling fragment must implement AddSkillListener interface");
+            throw new ClassCastException("Calling fragment must implement AddFeedItemListener interface");
         }
     }
 	
@@ -48,73 +49,44 @@ public class AddSkillDialog extends DialogFragment {
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
         
-        dialogView = inflater.inflate(R.layout.skill_dialog, null);
+        dialogView = inflater.inflate(R.layout.feeditem_dialog, null);
 
         builder.setView(dialogView);
         
-        builder.setMessage(R.string.add_skill)
+        builder.setMessage(R.string.add_feeditem)
                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        
-                	   saveNewSkill(dialog);
                 	   saveNewFeedItem(dialog);
-                	   mListener.onDialogPositiveClick(AddSkillDialog.this); 
+                	   mListener.onDialogPositiveClick(AddFeedItemDialog.this); 
                    }
                })
                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // User cancelled the dialog
-                	   mListener.onDialogNegativeClick(AddSkillDialog.this);
+                	   mListener.onDialogNegativeClick(AddFeedItemDialog.this);
                    }
                });
         // Create the AlertDialog object and return it
         return builder.create();
     }
 	
-	private void saveNewSkill(DialogInterface Dialog){
+	private void saveNewFeedItem( DialogInterface dialog)
 
-        fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
+	{
+		fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
         String firstName = fbUser.getFirstName();
         String lastName = fbUser.getLastName();
-		skill = (EditText) dialogView.findViewById(R.id.skill_from_skill);
-		skill_level = (RatingBar) dialogView.findViewById(R.id.skill_level);
-	
-		ParseObject skillParse = new ParseObject("Skill");		
-		if (skill != null){
-			skillParse.put("Skill", skill.getText().toString());
-		}
-		if (skill_level != null){
-			skillParse.put("Experience", skill_level.getRating());
-		}
+		skill = (EditText) dialogView.findViewById(R.id.skill_from_feeditem);
+		feedItemText = (EditText) dialogView.findViewById(R.id.feeditem_text);
 		
-		if (firstName != null && lastName != null){
-			skillParse.put("CreatedBy", firstName + " " + lastName);
-		}
-		
-		skillParse.saveInBackground();
-		currentSkill = skillParse;
-	}
-	
-	private void saveNewFeedItem(DialogInterface Dialog){
-
-        fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
-        String firstName = fbUser.getFirstName();
-        String lastName = fbUser.getLastName();
-        String experienceStr;
-        
-		skill = (EditText) dialogView.findViewById(R.id.skill_from_skill);
-		skill_level = (RatingBar) dialogView.findViewById(R.id.skill_level);
-	
 		ParseObject feedItemParse = new ParseObject("FeedItem");		
 		if (skill != null){
 			feedItemParse.put("Skill", skill.getText().toString());
 		}
-		if (skill_level != null){
-			
-			experienceStr = Utils.getSkillLevel( skill_level.getRating());
+		if (feedItemText != null){
+			feedItemParse.put("FeedItemText", feedItemText.getText().toString());
 		}
-		
-		feedItemParse.put("FeedItemText", firstName + " " + lastName + " a adaugat un nou skill.");
 		
 		if (firstName != null && lastName != null){
 			feedItemParse.put("CreatedBy", firstName + " " + lastName);
@@ -123,10 +95,9 @@ public class AddSkillDialog extends DialogFragment {
 		feedItemParse.saveInBackground();
 		currentFeedItem = feedItemParse;
 	}
-	
+
 	public ParseObject getSession()
 	{
-		return currentSkill;
+		return currentFeedItem;
 	}
-
 }

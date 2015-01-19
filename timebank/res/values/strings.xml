@@ -74,6 +74,8 @@
     <string name="ans_session">Answer the session</string>
     <string name="approve_session">Approve</string>
     <string name="reject_session">Reject</string>
+    <string name="feeditem_text">Text for your new ad</string>
+    <string name="add_feeditem">Boost you skills!</string>
 
     <!-- Dialog string arrays -->
     <string-array name="experience_level">

@@ -49,7 +49,7 @@ import java.util.List;
  */
 public class HomeScreenFragment extends Fragment
         implements OnGestureListener
-        , AddSkillDialog.AddSkillListener {
+        , AddFeedItemDialog.AddFeedItemListener{
 
     private static final String TAG = "HomeScreenFragment";
     private static final String PENDING_ANNOUNCE_KEY = "pendingAnnounce";
@@ -557,35 +557,36 @@ public class HomeScreenFragment extends Fragment
     public void onResume() {
         super.onResume();
         uiHelper.onResume();
+        //readFeedList();
     }
 
     public void addNewFeedItem() {
-        DialogFragment newFragment = new AddSkillDialog();
+        DialogFragment newFragment = new AddFeedItemDialog();
         newFragment.setTargetFragment(this, 0);
-        newFragment.show(getFragmentManager(), "skill");
+        newFragment.show(getFragmentManager(), "feeditem");
     }
 
     public void readFeedList() {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Skill");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("FeedItem");
 
         query.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> skillList, ParseException e) {
+            public void done(List<ParseObject> feedList, ParseException e) {
                 if (e == null) {
-                    Log.d(TAG, "Retrieved " + skillList.size() + " skills");
+                    Log.d(TAG, "Retrieved " + feedList.size() + " skills");
 
-                    ParseObject skillParse = new ParseObject("Skill");
-                    for (int i = 0; i < skillList.size(); i++) {
-                        skillParse = skillList.get(i);
-                        String skill = skillParse.getString("Skill");
-                        double experience = skillParse.getDouble("Experience");
-                        String user = skillParse.getString("CreatedBy");
+                    ParseObject feedItemParse = new ParseObject("FeedItem");
+                    for (int i = 0; i < feedList.size(); i++) {
+                    	feedItemParse = feedList.get(i);
+                        String skill = feedItemParse.getString("Skill");
+                        String feedItemText = feedItemParse.getString("FeedItemText");
+                        String user = feedItemParse.getString("CreatedBy");
 
-                        String main_string = skill;
-                        String default_string = Utils.getSkillLevel(experience)+ ", User: " + user;
+                        String main_string = feedItemText;
+                        String default_string = "Skill: " + skill+ " by User: " + user;
 
                         Log.d(TAG, "Adding new item with values:" + main_string + " " + default_string);
                         //listElements.add(new SessionListElement(i, skill, default_string));
-                        listAdapter.add(new FeedListElement(i, main_string, default_string, skillParse));
+                        listAdapter.add(new FeedListElement(i, main_string, default_string, feedItemParse));
                         itemsNumber++;
                     }
 
@@ -675,22 +676,24 @@ public class HomeScreenFragment extends Fragment
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
 
-        ParseObject skillParse;
+        ParseObject feedParse;
 
-        AddSkillDialog addSkillDialog = (AddSkillDialog) dialog;
+        AddFeedItemDialog addFeedItemDialog = (AddFeedItemDialog) dialog;
 
-        skillParse = addSkillDialog.getSession();
+        feedParse = addFeedItemDialog.getSession();
 
-        String skill = skillParse.getString("Skill");
-        String experience = skillParse.getString("Experience");
+        String skill = feedParse.getString("Skill");
+        String feedItemText = feedParse.getString("FeedItemText");
+        String user = feedParse.getString("CreatedBy");
 
-        String main_string = skill;
-        String default_string = "Nivel: " + experience;
+        String main_string = feedItemText;
+        String default_string = "Skill: " + skill+ " by User: " + user;
+ 
 
         //Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
 
 
-        listAdapter.add(new FeedListElement(itemsNumber, main_string, default_string, skillParse));
+        listAdapter.add(new FeedListElement(itemsNumber, main_string, default_string, feedParse));
         itemsNumber++;
 
         listAdapter.notifyDataSetChanged();

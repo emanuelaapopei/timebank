@@ -154,7 +154,7 @@ public class HomeScreenFragment extends Fragment
         listView = (ListView) view.findViewById(R.id.feed_list);
         listElements = new ArrayList<BaseListElement>();
 
-        readFeedList();
+        //readFeedList();
 
         // Set the list view adapter
         listAdapter = new ActionListAdapter(getActivity(), R.id.feed_list, listElements);
@@ -557,7 +557,7 @@ public class HomeScreenFragment extends Fragment
     public void onResume() {
         super.onResume();
         uiHelper.onResume();
-        //readFeedList();
+        readFeedList();
     }
 
     public void addNewFeedItem() {
@@ -567,6 +567,9 @@ public class HomeScreenFragment extends Fragment
     }
 
     public void readFeedList() {
+    	
+    	listAdapter.clear();
+    	itemsNumber = 0;
         ParseQuery<ParseObject> query = ParseQuery.getQuery("FeedItem");
 
         query.findInBackground(new FindCallback<ParseObject>() {

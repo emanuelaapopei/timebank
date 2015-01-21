@@ -49,7 +49,8 @@ import java.util.List;
  */
 public class HomeScreenFragment extends Fragment
         implements OnGestureListener
-        , AddFeedItemDialog.AddFeedItemListener{
+        , AddFeedItemDialog.AddFeedItemListener
+        ,FilterFeedDialog.FilterFeedListener{
 
     private static final String TAG = "HomeScreenFragment";
     private static final String PENDING_ANNOUNCE_KEY = "pendingAnnounce";
@@ -75,6 +76,9 @@ public class HomeScreenFragment extends Fragment
     private ImageButton addFeedButton;
     private ImageButton filterFeedButton;
     private int itemsNumber;
+    
+    private String filterBySkill;
+    private String filterByUser;
 
     private Session.StatusCallback sessionCallback = new Session.StatusCallback() {
         @Override
@@ -147,7 +151,8 @@ public class HomeScreenFragment extends Fragment
         filterFeedButton = (ImageButton) view.findViewById(R.id.filter_feed);
         filterFeedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                Toast.makeText(activity.getApplicationContext(), "Filtering will be here soon", 100).show();
+                //Toast.makeText(activity.getApplicationContext(), "Filtering will be here soon", 100).show();
+            	openFilterDialog();
             }
         });
 
@@ -566,12 +571,30 @@ public class HomeScreenFragment extends Fragment
         newFragment.show(getFragmentManager(), "feeditem");
     }
 
+    public void openFilterDialog()
+    {
+    	DialogFragment newFragment = new FilterFeedDialog();
+        newFragment.setTargetFragment(this, 0);
+        newFragment.show(getFragmentManager(), "filter_feed");
+    }
+    
     public void readFeedList() {
+    	
+    	//Log.d(TAG, "start - readFeedList");
     	
     	listAdapter.clear();
     	itemsNumber = 0;
         ParseQuery<ParseObject> query = ParseQuery.getQuery("FeedItem");
-
+        
+        if (filterBySkill != null && !filterBySkill.equals(""))
+        {
+        	query.whereEqualTo("Skill", filterBySkill);
+        }
+        if ( filterByUser != null && !filterByUser.equals(""))
+        {
+        	query.whereEqualTo("CreatedBy", filterByUser);
+        }
+        	
         query.orderByDescending("updatedAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> feedList, ParseException e) {
@@ -588,7 +611,7 @@ public class HomeScreenFragment extends Fragment
                         String main_string = feedItemText;
                         String default_string = "Skill: " + skill+ " by User: " + user;
 
-                        Log.d(TAG, "Adding new item with values:" + main_string + " " + default_string);
+                        //Log.d(TAG, "Adding new item with values:" + main_string + " " + default_string);
                         //listElements.add(new SessionListElement(i, skill, default_string));
                         listAdapter.add(new FeedListElement(i, main_string, default_string, feedItemParse));
                         itemsNumber++;
@@ -708,4 +731,25 @@ public class HomeScreenFragment extends Fragment
         // TODO Auto-generated method stub
 
     }
+
+	@Override
+	public void onFilterPositiveClick(DialogFragment dialog) {
+		
+		//Log.d(TAG, "start - onFilterPositiveClick");
+		
+		FilterFeedDialog filterFeedDialog = (FilterFeedDialog) dialog;
+		
+		filterBySkill = filterFeedDialog.getSkill();
+		filterByUser = filterFeedDialog.getUser();
+		
+		readFeedList();
+		
+		//Log.d(TAG, filterBySkill);
+	}
+
+	@Override
+	public void onFilterNegativeClick(DialogFragment dialog) {
+		// TODO Auto-generated method stub
+		
+	}
 }

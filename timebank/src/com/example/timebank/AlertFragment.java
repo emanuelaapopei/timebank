@@ -28,7 +28,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-public class AlertFragment extends Fragment {
+public class AlertFragment extends Fragment 
+							implements AddAlertDialog.AddAlertListener{
 	private static final String TAG = "timeBank";
 	
 	private ProfilePictureView profilePictureView;
@@ -39,9 +40,11 @@ public class AlertFragment extends Fragment {
     private ActionListAdapter listAdapter = null;
     private ListView listView;
 	private ImageButton addAlert;
+	private int alertNumber;
 
 	public AlertFragment(String UserId) {
 		userId = UserId;
+		alertNumber = 0;
 	}
 
 	@Override
@@ -108,6 +111,7 @@ public class AlertFragment extends Fragment {
     public void addNewAlert()
     {
     	DialogFragment newFragment = new AddAlertDialog();
+    	newFragment.setTargetFragment(this, 0);
         newFragment.show(getFragmentManager(), "alert");
     }
     
@@ -145,9 +149,10 @@ public class AlertFragment extends Fragment {
     	            		default_string = "no user specified";
     	            	}
     	            	
-    	            	Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
+    	            	//Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
     	            	//listElements.add(new SessionListElement(i, skill, default_string));
     	            	listAdapter.add(new AlertListElement(i, main_string, default_string, alert));
+    	            	alertNumber++;
     	            }
     	            
     	        } else {
@@ -253,5 +258,38 @@ public class AlertFragment extends Fragment {
 			// TODO Auto-generated method stub
 			
 		}
+	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		AddAlertDialog addAlertDialog = (AddAlertDialog) dialog;
+        ParseObject alertParse = addAlertDialog.getAlert();
+		
+        String skill = alertParse.getString("Skill");
+    	String alertFromUser = alertParse.getString("AlertFromUser");
+    	
+    	String main_string = "Alert for skill: " + skill;
+    	String default_string = "";
+    	if (!alertFromUser.equals(""))
+    	{
+    		default_string = "from user " + alertFromUser;
+    	}
+    	else 
+    	{
+    		default_string = "no user specified";
+    	}
+    	
+    	//Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
+    	//listElements.add(new SessionListElement(i, skill, default_string));
+    	listAdapter.add(new AlertListElement(alertNumber, main_string, default_string, alertParse));
+    	alertNumber++;
+    	
+    	listAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		// TODO Auto-generated method stub
+		
 	}
 }

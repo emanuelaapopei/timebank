@@ -1,5 +1,7 @@
 package com.example.timebank;
 
+
+import com.example.timebank.FilterFeedDialog.FilterFeedListener;
 import com.facebook.model.GraphUser;
 import com.parse.ParseObject;
 
@@ -21,7 +23,27 @@ public class AddAlertDialog extends DialogFragment {
 	
 	private GraphUser fbUser;
 	
+	private ParseObject currentAlert;
+	
 	private static final String TAG = "timeBank";
+	
+	public interface AddAlertListener {
+        public void onDialogPositiveClick(DialogFragment dialog);
+        public void onDialogNegativeClick(DialogFragment dialog);
+    }
+	
+	AddAlertListener mListener;
+	
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        try {
+        	mListener = (AddAlertListener) getTargetFragment();
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Calling fragment must implement AddAlertListener interface");
+        }
+    }
 	
 	@Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -42,12 +64,12 @@ public class AddAlertDialog extends DialogFragment {
                    public void onClick(DialogInterface dialog, int id) {
                 	   
                 	   saveNewAlert(dialog);
-                       
+                	   mListener.onDialogPositiveClick(AddAlertDialog.this);
                    }
                })
                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
-                       // User cancelled the dialog
+                	   mListener.onDialogNegativeClick(AddAlertDialog.this);
                    }
                });
         // Create the AlertDialog object and return it
@@ -78,6 +100,13 @@ public class AddAlertDialog extends DialogFragment {
 		}
 		
 		alert.saveInBackground();
+		
+		currentAlert = alert;
+	}
+	
+	public ParseObject getAlert()
+	{
+		return currentAlert;
 	}
 
 }

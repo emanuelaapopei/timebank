@@ -572,6 +572,7 @@ public class HomeScreenFragment extends Fragment
     	itemsNumber = 0;
         ParseQuery<ParseObject> query = ParseQuery.getQuery("FeedItem");
 
+        query.orderByDescending("updatedAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> feedList, ParseException e) {
                 if (e == null) {

@@ -31,7 +31,8 @@ import android.widget.TextView;
 
 
 public class SessionFragment extends Fragment
-        implements AddSessionDialog.AddSessionListener {
+        implements AddSessionDialog.AddSessionListener, 
+        		   AnswerSessionDialog.AnswerSessionListener{
     private static final String TAG = "timeBank";
 
     private ProfilePictureView profilePictureView;
@@ -119,8 +120,9 @@ public class SessionFragment extends Fragment
 
     }
 
-    public void answerSession(ParseObject SessionParse) {
-        DialogFragment newFragment = new AnswerSessionDialog(SessionParse);
+    public void answerSession(ParseObject SessionParse, int SessionNumber) {
+        DialogFragment newFragment = new AnswerSessionDialog(SessionParse, SessionNumber);
+        newFragment.setTargetFragment(this, 0);
         newFragment.show(getFragmentManager(), "answerSession");
     }
 
@@ -133,6 +135,7 @@ public class SessionFragment extends Fragment
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Session");
 
         query.whereEqualTo("Sender", firstName + " " + lastName);
+        query.orderByDescending("updatedAt");
         //query.whereEqualTo("Sender", "Ana");
 
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -285,7 +288,7 @@ public class SessionFragment extends Fragment
                     String status = sesionParse.getString("Status");
 
                     if (status.equals("New")) {
-                        answerSession(sesionParse);
+                        answerSession(sesionParse, getRequestCode());
                     } else {
                         AlertDialog alert = new AlertDialog.Builder(getActivity()).create();
                         alert.setMessage("Aceasta sesiune a fost deja aprobata/respinsa.");
@@ -294,6 +297,15 @@ public class SessionFragment extends Fragment
                 }
             };
         }
+        
+        protected void changeStatus(String Status)
+        {
+        	String main_text = this.getText1();
+        	String skill = main_text.substring(0, main_text.indexOf("-"));
+        	main_text = "";
+        	main_text = skill + "- " + Status;
+        	this.setText1(main_text);
+        }
 
         @Override
         protected void populateOGAction(OpenGraphAction action) {
@@ -301,6 +313,28 @@ public class SessionFragment extends Fragment
 
         }
     }
+
+	@Override
+	public void onApproveClick(DialogFragment dialog) {
+		AnswerSessionDialog ansSessionDialog = (AnswerSessionDialog) dialog;
+		int sessionNum = ansSessionDialog.getSessionNumber();
+		
+		SessionListElement session = (SessionListElement) listAdapter.getItem(sessionNum);
+		session.changeStatus("Approved");
+		
+		listAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void onRejectClick(DialogFragment dialog) {
+		AnswerSessionDialog ansSessionDialog = (AnswerSessionDialog) dialog;
+		int sessionNum = ansSessionDialog.getSessionNumber();
+		
+		SessionListElement session = (SessionListElement) listAdapter.getItem(sessionNum);
+		session.changeStatus("Rejected");
+		
+		listAdapter.notifyDataSetChanged();
+	}
 
 
 }

@@ -101,6 +101,8 @@ public class SkillBoardFragment extends Fragment
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Skill");
 
         query.whereEqualTo("CreatedBy", firstName + " " + lastName);
+        query.orderByDescending("updatedAt");
+        
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> skillList, ParseException e) {
                 if (e == null) {

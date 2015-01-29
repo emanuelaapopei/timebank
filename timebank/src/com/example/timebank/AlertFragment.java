@@ -125,6 +125,7 @@ public class AlertFragment extends Fragment
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Alert");
 		
 		query.whereEqualTo("CreatedBy", firstName + " " + lastName);
+		query.orderByDescending("updatedAt");
 		
 		query.findInBackground(new FindCallback<ParseObject>() {
     	    public void done(List<ParseObject> alertList, ParseException e) {

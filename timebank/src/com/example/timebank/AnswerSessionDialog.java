@@ -31,15 +31,34 @@ public class AnswerSessionDialog extends DialogFragment{
 	private RatingBar rating;
 	
 	private ParseObject sessionParse;
-	
+	private int sessionNr;
 	private GraphUser fbUser;
 	
 	private static final String TAG = "timeBank";
 	
-	public AnswerSessionDialog(ParseObject parseObj)
+	public interface AnswerSessionListener {
+        public void onApproveClick(DialogFragment dialog);
+        public void onRejectClick(DialogFragment dialog);
+    }
+	
+	AnswerSessionListener mListener;
+	
+	public AnswerSessionDialog(ParseObject parseObj, int requestedCode)
 	{
 		sessionParse = parseObj;
+		sessionNr = requestedCode;
 	}
+	
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        try {
+        	mListener = (AnswerSessionListener) getTargetFragment();
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Calling fragment must implement AnswerSessionListener interface");
+        }
+    }
 	
 	@Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -90,13 +109,17 @@ public class AnswerSessionDialog extends DialogFragment{
                 	   
                 	   //update the balance for the user
                 	   updateBalance(user.getText().toString());
+                	   
+                	   mListener.onApproveClick(AnswerSessionDialog.this);
                    }
                })
                .setNegativeButton(R.string.reject_session, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                 	   
                 	   sessionParse.put("Status", "Rejected");
-                	   sessionParse.saveInBackground();              	   
+                	   sessionParse.saveInBackground();  
+                	   
+                	   mListener.onRejectClick(AnswerSessionDialog.this);
                    }
                });
         
@@ -180,4 +203,7 @@ public class AnswerSessionDialog extends DialogFragment{
 		});
 	}
 
+	public int getSessionNumber() {
+        return sessionNr;
+    }
 }

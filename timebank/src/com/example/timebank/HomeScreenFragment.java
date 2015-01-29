@@ -563,6 +563,9 @@ public class HomeScreenFragment extends Fragment
         super.onResume();
         uiHelper.onResume();
         readFeedList();
+        
+        int balance = ((TimeBankApplication) getActivity().getApplication()).getBalance();
+        balanceValueView.setText(String.valueOf(balance));
     }
 
     public void addNewFeedItem() {
@@ -719,8 +722,8 @@ public class HomeScreenFragment extends Fragment
 
         //Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
 
-
-        listAdapter.add(new FeedListElement(itemsNumber, main_string, default_string, feedParse));
+        listAdapter.insert(new FeedListElement(itemsNumber, main_string, default_string, feedParse), 0);
+        //listAdapter.add(new FeedListElement(itemsNumber, main_string, default_string, feedParse));
         itemsNumber++;
 
         listAdapter.notifyDataSetChanged();

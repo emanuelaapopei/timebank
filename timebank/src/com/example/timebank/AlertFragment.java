@@ -282,7 +282,8 @@ public class AlertFragment extends Fragment
     	
     	//Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
     	//listElements.add(new SessionListElement(i, skill, default_string));
-    	listAdapter.add(new AlertListElement(alertNumber, main_string, default_string, alertParse));
+    	//listAdapter.add(new AlertListElement(alertNumber, main_string, default_string, alertParse));
+    	listAdapter.insert(new AlertListElement(alertNumber, main_string, default_string, alertParse), 0);
     	alertNumber++;
     	
     	listAdapter.notifyDataSetChanged();

@@ -45,7 +45,6 @@ public class SessionFragment extends Fragment
     private ActionListAdapter listAdapter = null;
     private ImageButton addSession;
 
-
     public SessionFragment(String UserId) {
         userId = UserId;
         sessionNumber = 0;
@@ -203,6 +202,7 @@ public class SessionFragment extends Fragment
         Log.d(TAG, "Adding new item with values:" + main_string + " " + receiver + " " + hours);
         //listElements.add(new SessionListElement(i, skill, default_string));
         listAdapter.add(new SessionListElement(sessionNumber, main_string, default_string, session));
+        //listAdapter.insert(new SessionListElement(sessionNumber, main_string, default_string, session), 0);
         sessionNumber++;
 
         listAdapter.notifyDataSetChanged();
@@ -322,7 +322,7 @@ public class SessionFragment extends Fragment
 		SessionListElement session = (SessionListElement) listAdapter.getItem(sessionNum);
 		session.changeStatus("Approved");
 		
-		listAdapter.notifyDataSetChanged();
+		listAdapter.notifyDataSetChanged();		
 	}
 
 	@Override

@@ -34,6 +34,8 @@ public class AnswerSessionDialog extends DialogFragment{
 	private int sessionNr;
 	private GraphUser fbUser;
 	
+	private int currentBalance;
+	
 	private static final String TAG = "timeBank";
 	
 	public interface AnswerSessionListener {
@@ -183,17 +185,17 @@ public class AnswerSessionDialog extends DialogFragment{
      	            for (int i = 0; i < userList.size(); i++)
      	            {
      	            	userParse = userList.get(i);
-     	            	int balance = userParse.getInt("balance");
+     	            	int balanceNr = userParse.getInt("balance");
      	            	
-     	            	Log.d(TAG, "Old balance =  " + balance);
+     	            	Log.d(TAG, "Old balance =  " + balanceNr);
      	            	
-     	            	balance -= sessionParse.getInt("Hours");
+     	            	balanceNr -= sessionParse.getInt("Hours");
      	            	
-     	            	Log.d(TAG, "New balance =  " + balance);
+     	            	Log.d(TAG, "New balance =  " + balanceNr);
      	            	
-     	            	userParse.put("balance", balance);
+     	            	userParse.put("balance", balanceNr);
      	            	userParse.saveInBackground();
-     	            	Log.d(TAG, "Saved the user Parse object");
+     	            	Log.d(TAG, "Saved the user Parse object");    
      	            }
     	        }
     	        else {
@@ -201,9 +203,18 @@ public class AnswerSessionDialog extends DialogFragment{
     	        }
     	    }
 		});
+		
+		currentBalance = ((TimeBankApplication) getActivity().getApplication()).getBalance();
+		currentBalance -= sessionParse.getInt("Hours");
+		((TimeBankApplication) getActivity().getApplication()).setBalance(currentBalance);
 	}
 
 	public int getSessionNumber() {
         return sessionNr;
     }
+	
+	public int getBalance()
+	{
+		return currentBalance;
+	}
 }

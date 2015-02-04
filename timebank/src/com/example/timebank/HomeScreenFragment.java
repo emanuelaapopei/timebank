@@ -75,6 +75,7 @@ public class HomeScreenFragment extends Fragment
 
     private ImageButton addFeedButton;
     private ImageButton filterFeedButton;
+    private boolean isFiltered = false;
     private int itemsNumber;
     
     private String filterBySkill;
@@ -151,8 +152,7 @@ public class HomeScreenFragment extends Fragment
         filterFeedButton = (ImageButton) view.findViewById(R.id.filter_feed);
         filterFeedButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                //Toast.makeText(activity.getApplicationContext(), "Filtering will be here soon", 100).show();
-            	openFilterDialog();
+                openFilterDialog();
             }
         });
 
@@ -576,16 +576,23 @@ public class HomeScreenFragment extends Fragment
 
     public void openFilterDialog()
     {
-    	DialogFragment newFragment = new FilterFeedDialog();
-        newFragment.setTargetFragment(this, 0);
-        newFragment.show(getFragmentManager(), "filter_feed");
+        if(!isFiltered){
+            DialogFragment newFragment = new FilterFeedDialog();
+            newFragment.setTargetFragment(this, 0);
+            newFragment.show(getFragmentManager(), "filter_feed");
+        }
+        else{
+            filterFeedButton.setImageResource(R.drawable.filter);
+            filterBySkill = null;
+            filterByUser = null;
+            isFiltered = false;
+            readFeedList();
+        }
+
     }
     
     public void readFeedList() {
-    	
-    	//Log.d(TAG, "start - readFeedList");
-    	
-    	listAdapter.clear();
+        listAdapter.clear();
     	itemsNumber = 0;
         ParseQuery<ParseObject> query = ParseQuery.getQuery("FeedItem");
         
@@ -731,23 +738,17 @@ public class HomeScreenFragment extends Fragment
 
     @Override
     public void onDialogNegativeClick(DialogFragment dialog) {
-        // TODO Auto-generated method stub
-
     }
 
 	@Override
 	public void onFilterPositiveClick(DialogFragment dialog) {
-		
-		//Log.d(TAG, "start - onFilterPositiveClick");
-		
 		FilterFeedDialog filterFeedDialog = (FilterFeedDialog) dialog;
-		
 		filterBySkill = filterFeedDialog.getSkill();
 		filterByUser = filterFeedDialog.getUser();
-		
 		readFeedList();
-		
-		//Log.d(TAG, filterBySkill);
+        
+        filterFeedButton.setImageResource(R.drawable.clear);
+        isFiltered = true;
 	}
 
 	@Override

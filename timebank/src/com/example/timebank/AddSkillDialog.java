@@ -1,6 +1,12 @@
 package com.example.timebank;
+import java.util.List;
+
 import com.facebook.model.GraphUser;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
+import com.parse.ParseQuery;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -9,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -21,7 +28,9 @@ public class AddSkillDialog extends DialogFragment {
 	private View dialogView;
 	private GraphUser fbUser;
 	private ParseObject currentSkill, currentFeedItem;
-
+	
+	private static final String TAG = "timeBank";
+	
 	public interface AddSkillListener {
         public void onDialogPositiveClick(DialogFragment dialog);
         public void onDialogNegativeClick(DialogFragment dialog);
@@ -57,7 +66,11 @@ public class AddSkillDialog extends DialogFragment {
                    public void onClick(DialogInterface dialog, int id) {
                        
                 	   saveNewSkill(dialog);
+                	   
                 	   saveNewFeedItem(dialog);
+                	   
+                	   sendNotificationAlert();
+                	   
                 	   mListener.onDialogPositiveClick(AddSkillDialog.this); 
                    }
                })
@@ -70,6 +83,47 @@ public class AddSkillDialog extends DialogFragment {
         // Create the AlertDialog object and return it
         return builder.create();
     }
+	
+	private void sendNotificationAlert()
+	{
+		//read all alerts from the database that have Skill column set to the current skill
+        
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Alert");
+		query.whereEqualTo("Skill", skill.getText().toString());
+		
+		query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> alertList, ParseException e) {
+                if (e == null) {
+                    Log.d(TAG, "Retrieved " + alertList.size() + " alerts");
+
+                    ParseObject alertParse = new ParseObject("Alert");
+                    
+                    String firstName = fbUser.getFirstName();
+                    String lastName = fbUser.getLastName();
+                    
+                    for (int i = 0; i < alertList.size(); i++) {
+                        alertParse = alertList.get(i);
+                                                
+                        String user = alertParse.getString("CreatedBy");
+                        String forUser = alertParse.getString("AlertFromUser");
+                        
+                        if (forUser.equals("") || forUser.equals(firstName + " " + lastName))
+                        {                        
+	                        String channel = user;
+	                		channel = channel.replaceAll(" ","");
+	                		
+	                		ParsePush push = new ParsePush();
+	                		push.setChannel(channel);
+	                		push.setMessage(firstName + " " + lastName + " has skill "+ skill.getText().toString());
+	                 	   	push.sendInBackground();
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "Error: " + e.getMessage());
+                }
+            }
+        });
+	}
 	
 	private void saveNewSkill(DialogInterface Dialog){
 

@@ -150,8 +150,6 @@ public class AlertFragment extends Fragment
     	            		default_string = "no user specified";
     	            	}
     	            	
-    	            	//Log.d(TAG, "Adding new item with values:" + main_string + " " +default_string);
-    	            	//listElements.add(new SessionListElement(i, skill, default_string));
     	            	listAdapter.add(new AlertListElement(i, main_string, default_string, alert));
     	            	alertNumber++;
     	            }

@@ -19,7 +19,7 @@ public class Utils {
 		if(value == 3.0)
 			return "Advanced";
 		if(value == 3.5)
-			return "Experinced";
+			return "Experienced";
 		if(value == 4.0)
 			return "Professional";
 		if(value == 4.5)

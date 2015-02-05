@@ -117,8 +117,6 @@ public class SkillBoardFragment extends Fragment
                         String main_string = skill;
                         String default_string = Utils.getSkillLevel(skill_level);
 
-                        Log.d(TAG, "Adding new item with values:" + main_string + " " + default_string);
-                        //listElements.add(new SessionListElement(i, skill, default_string));
                         listAdapter.add(new SkillListElement(i, main_string, default_string, skillParse));
                         skillNumber++;
                     }

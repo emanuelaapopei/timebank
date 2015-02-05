@@ -52,7 +52,7 @@ public class HomeScreenFragment extends Fragment
         , AddFeedItemDialog.AddFeedItemListener
         ,FilterFeedDialog.FilterFeedListener{
 
-    private static final String TAG = "HomeScreenFragment";
+    private static final String TAG = "timeBank";
     private static final String PENDING_ANNOUNCE_KEY = "pendingAnnounce";
     private static final Uri M_FACEBOOK_URL = Uri.parse("http://m.facebook.com");
     private static final int REAUTH_ACTIVITY_CODE = 100;
@@ -220,6 +220,8 @@ public class HomeScreenFragment extends Fragment
                         ((TimeBankApplication) getActivity().getApplication()).setUser(user);
 
                         getBalanceFromDB();
+                        
+                        subscribeToUserChannel();
                     }
                 }
                 if (response.getError() != null) {
@@ -243,7 +245,18 @@ public class HomeScreenFragment extends Fragment
         }
     }
 
-
+    private void subscribeToUserChannel()
+    {
+    	String channel = "";
+	    if (fbUser != null)
+	    {
+	    	channel = fbUser.getFirstName()+fbUser.getLastName();   	
+	    }
+	    ((TimeBankApplication) getActivity().getApplication()).parseSubcribe(channel);
+	    
+	    Log.d(TAG, "subscribed to channel: " + channel);
+    }
+    
     private void getBalanceFromDB() {
         //check if the current user has balance in the database
         fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();

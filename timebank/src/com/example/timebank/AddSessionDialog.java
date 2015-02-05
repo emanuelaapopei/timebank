@@ -74,11 +74,8 @@ public class AddSessionDialog extends DialogFragment {
                 	   
                 	   saveNewSession(dialog);
                 	   
-                	   ParsePush push = new ParsePush();
-                	   push.setChannel("");
-                	   push.setMessage("A new session has been created.");
-                	   push.sendInBackground();
-                	   
+                	   sendNotification();
+                	                   	   
                 	   //Log.d(TAG, "before calling onDialogPositiveClick");
                 	   mListener.onDialogPositiveClick(AddSessionDialog.this);                  
                    }
@@ -93,6 +90,19 @@ public class AddSessionDialog extends DialogFragment {
         // Create the AlertDialog object and return it
         return builder.create();
     }
+	
+	private void sendNotification()
+	{
+		String channel = user.getText().toString();
+		channel = channel.replaceAll(" ","");
+		
+		ParsePush push = new ParsePush();
+		push.setChannel(channel);
+		push.setMessage("A new session has been created.");
+ 	   	push.sendInBackground();
+ 	   	
+ 	   	Log.d(TAG, "sent notification on channel: " + channel);
+	}
 	
 	private void saveNewSession(DialogInterface Dialog)
 	{

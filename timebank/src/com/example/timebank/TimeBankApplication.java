@@ -65,14 +65,9 @@ public class TimeBankApplication extends Application {
 		balance = newBalance;
 	}
 	
-	@Override
-	  public void onCreate() {
-	    super.onCreate();
-
-		// Initialize the Parse SDK.
-	    Parse.initialize(this, "aGRzy0mD7CnzhIrseg4wWFpS2LjX2wyIXX0yh5Yu", "PMNgqCNC17R5XHYxK5wo2ENOeUsimtox4JcD40d5");
-	 	
-	 	ParsePush.subscribeInBackground("", new SaveCallback() {
+	public void parseSubcribe(String Channel)
+	{	    
+	 	ParsePush.subscribeInBackground(Channel, new SaveCallback() {
 	 		  @Override
 	 		  public void done(ParseException e) {
 	 		    if (e == null) {
@@ -86,5 +81,14 @@ public class TimeBankApplication extends Application {
 	 		    }
 	 		  }
 	 		});
+	}
+	
+	@Override
+	  public void onCreate() {
+	    super.onCreate();
+
+		// Initialize the Parse SDK.
+	    Parse.initialize(this, "aGRzy0mD7CnzhIrseg4wWFpS2LjX2wyIXX0yh5Yu", "PMNgqCNC17R5XHYxK5wo2ENOeUsimtox4JcD40d5");
+	 	
 	  }
 }

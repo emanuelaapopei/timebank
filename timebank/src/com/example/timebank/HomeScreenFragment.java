@@ -632,10 +632,8 @@ public class HomeScreenFragment extends Fragment
                         String user = feedItemParse.getString("CreatedBy");
 
                         String main_string = feedItemText;
-                        String default_string = "Skill: " + skill+ " by User: " + user;
+                        String default_string = skill+ " by " + user;
 
-                        //Log.d(TAG, "Adding new item with values:" + main_string + " " + default_string);
-                        //listElements.add(new SessionListElement(i, skill, default_string));
                         listAdapter.add(new FeedListElement(i, main_string, default_string, feedItemParse));
                         itemsNumber++;
                     }
@@ -669,7 +667,7 @@ public class HomeScreenFragment extends Fragment
                 LayoutInflater inflater =
                         (LayoutInflater) getActivity()
                                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.listitem, null);
+                view = inflater.inflate(R.layout.listitemfeed, null);
             }
 
             BaseListElement listElement = listElements.get(position);

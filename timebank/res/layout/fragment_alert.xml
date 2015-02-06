@@ -50,7 +50,7 @@
 
     <ScrollView
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="430dp"
             android:fillViewport="true">
        
         <com.example.timebank.FullListView

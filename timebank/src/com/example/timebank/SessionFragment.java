@@ -120,6 +120,7 @@ public class SessionFragment extends Fragment
     }
 
     public void answerSession(ParseObject SessionParse, int SessionNumber) {
+    	Log.d(TAG, "Approve session "+ SessionNumber);
         DialogFragment newFragment = new AnswerSessionDialog(SessionParse, SessionNumber);
         newFragment.setTargetFragment(this, 0);
         newFragment.show(getFragmentManager(), "answerSession");
@@ -182,7 +183,7 @@ public class SessionFragment extends Fragment
                         String main_string = skill + " - " + status;
                         String default_string = "from user " + sender + " for " + hours + " hours";
 
-                        listAdapter.add(new SessionListElement(i, main_string, default_string, session));
+                        listAdapter.add(new SessionListElement(sessionNumber, main_string, default_string, session));
                         sessionNumber++;
                     }
 
@@ -363,6 +364,8 @@ public class SessionFragment extends Fragment
 		
 		SessionListElement session = (SessionListElement) listAdapter.getItem(sessionNum);
 		session.changeStatus("Approved");
+		
+		Log.d(TAG, "Update session "+ sessionNum);
 		
 		listAdapter.notifyDataSetChanged();		
 	}

@@ -9,6 +9,6 @@
 
     <ImageView
             android:id="@+id/icon"
-            android:layout_width="170dp"
-            android:layout_height="47dp"/>
+            android:layout_width="177dp"
+            android:layout_height="57dp"/>
 </LinearLayout>

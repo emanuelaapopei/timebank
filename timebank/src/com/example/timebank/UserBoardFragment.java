@@ -136,13 +136,13 @@ public class UserBoardFragment extends Fragment implements OnGestureListener{
         startActivity(intent);
     }
 
-    private void startMessagesActivity(int requestCode) {
-    	Toast.makeText(activity.getApplicationContext(), "INBOX ACTIVITY MISSING", 100).show();
-//        Intent intent = new Intent();
-//        Uri data = Uri.parse(userId);
-//        intent.setData(data);
-//        intent.setClass(getActivity(), SessionActivity.class);
-//        startActivity(intent);
+    private void startInboxActivity(int requestCode) {
+
+        Intent intent = new Intent();
+        Uri data = Uri.parse(userId);
+        intent.setData(data);
+        intent.setClass(getActivity(), InboxActivity.class);
+        startActivity(intent);
     }
     
     private class SkillListElement extends BaseListElement {
@@ -309,7 +309,7 @@ public class UserBoardFragment extends Fragment implements OnGestureListener{
                 public void onClick(View view) {
                     if (Session.getActiveSession() != null &&
                             Session.getActiveSession().isOpened()) {
-                        startMessagesActivity(getRequestCode());
+                        startInboxActivity(getRequestCode());
                     } else {
                         //activity.showSettingsFragment();
                     }

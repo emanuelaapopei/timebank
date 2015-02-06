@@ -135,7 +135,6 @@ public class SessionFragment extends Fragment
 
         query.whereEqualTo("Sender", firstName + " " + lastName);
         query.orderByDescending("updatedAt");
-        //query.whereEqualTo("Sender", "Ana");
 
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> sessionList, ParseException e) {
@@ -153,8 +152,36 @@ public class SessionFragment extends Fragment
                         String main_string = skill + " - " + status;
                         String default_string = "to user " + receiver + " for " + hours + " hours";
 
-                        Log.d(TAG, "Adding new item with values:" + main_string + " " + receiver + " " + hours);
-                        //listElements.add(new SessionListElement(i, skill, default_string));
+                        listAdapter.add(new SessionListElement(i, main_string, default_string, session));
+                        sessionNumber++;
+                    }
+
+                } else {
+                    Log.d(TAG, "Error: " + e.getMessage());
+                }
+            }
+        });
+        
+        ParseQuery<ParseObject> query2 = ParseQuery.getQuery("Session");
+        query2.whereEqualTo("Receiver", firstName + " " + lastName);
+        query2.orderByDescending("updatedAt");
+        
+        query2.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> sessionList, ParseException e) {
+                if (e == null) {
+                    Log.d(TAG, "Retrieved " + sessionList.size() + " sessions for me");
+
+                    ParseObject session = new ParseObject("Session");
+                    for (int i = 0; i < sessionList.size(); i++) {
+                        session = sessionList.get(i);
+                        String skill = session.getString("Skill");
+                        String sender = session.getString("Sender");
+                        int hours = session.getInt("Hours");
+                        String status = session.getString("Status");
+
+                        String main_string = skill + " - " + status;
+                        String default_string = "from user " + sender + " for " + hours + " hours";
+
                         listAdapter.add(new SessionListElement(i, main_string, default_string, session));
                         sessionNumber++;
                     }
@@ -286,12 +313,27 @@ public class SessionFragment extends Fragment
                 public void onClick(View view) {
 
                     String status = sesionParse.getString("Status");
+                    fbUser = ((TimeBankApplication) getActivity().getApplication()).getUser();
 
+                    String firstName = fbUser.getFirstName();
+                    String lastName = fbUser.getLastName();
+                    
                     if (status.equals("New")) {
-                        answerSession(sesionParse, getRequestCode());
+                    	
+                    	String Sender = sesionParse.getString("Sender");
+                    	if (Sender.equals(firstName + " " + lastName))
+                    	{
+                    		AlertDialog alert = new AlertDialog.Builder(getActivity()).create();
+                            alert.setMessage("You can't answer to a session created by you.");
+                            alert.show();
+                    	}
+                    	else
+                    	{
+                    		answerSession(sesionParse, getRequestCode());
+                    	}
                     } else {
                         AlertDialog alert = new AlertDialog.Builder(getActivity()).create();
-                        alert.setMessage("Aceasta sesiune a fost deja aprobata/respinsa.");
+                        alert.setMessage("This session has been approved/rejected.");
                         alert.show();
                     }
                 }

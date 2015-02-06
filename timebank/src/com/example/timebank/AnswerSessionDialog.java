@@ -86,7 +86,7 @@ public class AnswerSessionDialog extends DialogFragment{
         skill.setText(sessionParse.getString("Skill"));
         
 		user = (EditText) dialogView.findViewById(R.id.user_ans_session);
-		user.setText(sessionParse.getString("Receiver"));
+		user.setText(sessionParse.getString("Sender"));
 		
 		hours = (EditText) dialogView.findViewById(R.id.hours_ans_session);
 		hours.setText(sessionParse.getInt("Hours") + "h");

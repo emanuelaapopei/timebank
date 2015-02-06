@@ -61,6 +61,9 @@
     <string name="session">Session</string>
     <string name="session_default">Edit session</string>
     <string name="add_session">Create new session</string>
+    <!-- Inbox strings -->
+    <string name="inbox">Inbox</string>
+    <string name="add_msg">Send message</string>
 
     <!-- Homescreen strings -->
     <string name="new_ad">New ad</string>

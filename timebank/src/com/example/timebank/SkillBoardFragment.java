@@ -49,8 +49,7 @@ public class SkillBoardFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_skill_board,
-                container, false);
+        View view = inflater.inflate(R.layout.fragment_skill_board, container, false);
 
         profilePictureView = (ProfilePictureView) view.findViewById(R.id.selection_profile_pic);
         profilePictureView.setProfileId(userId);

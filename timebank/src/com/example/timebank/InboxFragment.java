@@ -1,9 +1,13 @@
 package com.example.timebank;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
+import org.xml.sax.DTDHandler;
+
 import com.facebook.model.GraphUser;
 import com.facebook.model.OpenGraphAction;
 import com.facebook.widget.ProfilePictureView;
@@ -11,6 +15,8 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,6 +48,9 @@ public class InboxFragment extends Fragment
     private ActionListAdapter listAdapter = null;
     private ImageButton addMsg;
     private int msgNumber;
+    SimpleDateFormat datef = new SimpleDateFormat("EEE, d MMM yyyy"); 
+    SimpleDateFormat hrsf = new SimpleDateFormat("HH:mm");
+   
 
     public InboxFragment(String UserId) {
         userId = UserId;
@@ -86,10 +95,18 @@ public class InboxFragment extends Fragment
         newFragment.show(getFragmentManager(), "skill");
     }
 
-    public void viewMessage(ParseObject skill, int skillNumber) {
-        DialogFragment newFragment = new EditSkillDialog(skill, skillNumber);
-        newFragment.setTargetFragment(this, 0);
-        newFragment.show(getFragmentManager(), "skilla");
+    public void viewMessage(ParseObject msgParse, int reqCode) {
+    	MsgListElement elem = (MsgListElement)listAdapter.getItem(reqCode);
+    	AlertDialog alert = new AlertDialog.Builder(getActivity()).create();
+    	StringBuilder builder = new StringBuilder();
+    	builder.append(datef.format(elem.created_));
+    	builder.append(" at ");
+    	builder.append(hrsf.format(elem.created_));
+    	builder.append('\n');
+    	builder.append(elem.is_sender ? "Me: " : msgParse.getString("Sender") + ": ");
+    	builder.append(msgParse.getString("Content"));    	
+        alert.setMessage(builder.toString());
+        alert.show();
     }
 
 
@@ -103,21 +120,18 @@ public class InboxFragment extends Fragment
         ParseQuery<ParseObject> query_b = ParseQuery.getQuery("Mesaj");
         query_b.whereEqualTo("Receiver", firstName + " " + lastName);
         
-        // TODO cannot have order in subquery parse
-        // query_b.orderByDescending("updatedAt");
-        
         List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
         queries.add(query_a);
         queries.add(query_b);        
         
-        ParseQuery.or(queries).findInBackground(new FindCallback<ParseObject>() {
+        query_b.or(queries).orderByDescending("createdAt").findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> msgList, ParseException e) {
                 if (e == null) {
                 	ParseObject msgPars = new ParseObject("Mesaj");
                     for (int i = 0; i < msgList.size(); i++) {
                         msgPars = msgList.get(i);
                         String sender = msgPars.getString("Sender");
-                        String receiver = msgPars.getString("Receiver");
+                        String receiver = msgPars.getString("Receiver");                        
                         String msg_content = msgPars.getString("Content");
                         Date created = msgPars.getCreatedAt();
                         
@@ -131,7 +145,7 @@ public class InboxFragment extends Fragment
                         	is_sender = false;
                         	text = sender;                        	
                         }
-
+                        text = text;
                         listAdapter.add(new MsgListElement(is_sender, i, text, msg_content, created, msgPars));
                         msgNumber++;
                     }
@@ -142,20 +156,6 @@ public class InboxFragment extends Fragment
             }
         });
         
-//        for (int i = 0; i < queryList.size(); i++) {
-//        	MsgListElement item =  (MsgListElement)queryList.get(i);
-//        	Date created = item.getParseObj().getCreatedAt();
-//        	int index = 0; 
-//        	
-//        	for (int j = 0; j < queryList.size(); j++) {
-//        		MsgListElement itemj =  queryList.get(j);
-//            	Date createdj = itemj.getParseObj().getCreatedAt();
-//        		if(created.after(createdj))
-//        			index++;
-//        	}
-//        	listAdapter.insert(item, index);                	
-//        }
-
         if (!getActivity().isFinishing()) {
             // Update view
             updateView();
@@ -240,7 +240,7 @@ public class InboxFragment extends Fragment
             return new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                   // viewMessage(msgParse, getRequestCode());
+                    viewMessage(msgParse, getRequestCode());
                 }
             };
         }

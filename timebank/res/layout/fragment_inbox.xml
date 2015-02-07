@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:facebook="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/wallinbox"
+        android:orientation="vertical">
+                    
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="0dp"
+            android:orientation="horizontal">
+
+        <com.facebook.widget.ProfilePictureView
+                android:id="@+id/selection_profile_pic"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_margin="10dp"
+                facebook:preset_size="normal"/>
+
+
+        <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="66dp"
+                android:paddingRight="0dp">
+
+            <ImageButton
+                    android:id="@+id/add_msg"
+                    android:background="@null"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="66dp"
+                    android:src="@drawable/add"
+                    android:paddingLeft="95dp"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+     
+    <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="430dp"
+                android:orientation="vertical">  
+
+    <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:fillViewport="true">
+                    
+            <com.example.timebank.FullListView
+                    android:id="@+id/inbox_list"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:dividerHeight="@dimen/item_list_padding"
+                    android:divider="#00000000"/>                            
+           
+    </ScrollView>
+    </LinearLayout>
+</LinearLayout>
+

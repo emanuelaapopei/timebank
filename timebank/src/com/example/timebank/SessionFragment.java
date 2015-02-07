@@ -119,9 +119,9 @@ public class SessionFragment extends Fragment
 
     }
 
-    public void answerSession(ParseObject SessionParse, int SessionNumber) {
+    public void answerSession(ParseObject SessionParse, int SessionNumber, boolean ans){
     	Log.d(TAG, "Approve session "+ SessionNumber);
-        DialogFragment newFragment = new AnswerSessionDialog(SessionParse, SessionNumber);
+        DialogFragment newFragment = new AnswerSessionDialog(SessionParse, SessionNumber, ans);
         newFragment.setTargetFragment(this, 0);
         newFragment.show(getFragmentManager(), "answerSession");
     }
@@ -151,7 +151,7 @@ public class SessionFragment extends Fragment
                         String status = session.getString("Status");
 
                         String main_string = skill + " - " + status;
-                        String default_string = "to user " + receiver + " for " + hours + " hours";
+                        String default_string = "to " + receiver + " for " + hours + " hours";
 
                         listAdapter.add(new SessionListElement(i, main_string, default_string, session));
                         sessionNumber++;
@@ -181,7 +181,7 @@ public class SessionFragment extends Fragment
                         String status = session.getString("Status");
 
                         String main_string = skill + " - " + status;
-                        String default_string = "from user " + sender + " for " + hours + " hours";
+                        String default_string = "from " + sender + " for " + hours + " hours";
 
                         listAdapter.add(new SessionListElement(sessionNumber, main_string, default_string, session));
                         sessionNumber++;
@@ -225,7 +225,7 @@ public class SessionFragment extends Fragment
         String status = session.getString("Status");
 
         String main_string = skill + " - " + status;
-        String default_string = "to user " + receiver + " for " + hours + " hours";
+        String default_string = "to " + receiver + " for " + hours + " hours";
 
         Log.d(TAG, "Adding new item with values:" + main_string + " " + receiver + " " + hours);
         //listElements.add(new SessionListElement(i, skill, default_string));
@@ -330,12 +330,20 @@ public class SessionFragment extends Fragment
                     	}
                     	else
                     	{
-                    		answerSession(sesionParse, getRequestCode());
+                    		answerSession(sesionParse, getRequestCode(), true);
                     	}
                     } else {
-                        AlertDialog alert = new AlertDialog.Builder(getActivity()).create();
-                        alert.setMessage("This session has been approved/rejected.");
-                        alert.show();
+                    	String Sender = sesionParse.getString("Sender");
+                    	if (Sender.equals(firstName + " " + lastName))
+                    	{
+                    		answerSession(sesionParse, getRequestCode(), false);
+                    	}
+                    	else 
+                    	{
+	                        AlertDialog alert = new AlertDialog.Builder(getActivity()).create();
+	                        alert.setMessage("You have already approved/rejected this session");
+	                        alert.show();
+                    	}
                     }
                 }
             };

@@ -33,6 +33,7 @@ public class AnswerSessionDialog extends DialogFragment{
 	private ParseObject sessionParse;
 	private int sessionNr;
 	private GraphUser fbUser;
+	private boolean answerSession;
 	
 	private int currentBalance;
 	
@@ -45,10 +46,11 @@ public class AnswerSessionDialog extends DialogFragment{
 	
 	AnswerSessionListener mListener;
 	
-	public AnswerSessionDialog(ParseObject parseObj, int requestedCode)
+	public AnswerSessionDialog(ParseObject parseObj, int requestedCode, boolean ans)
 	{
 		sessionParse = parseObj;
 		sessionNr = requestedCode;
+		answerSession = ans;
 	}
 	
 	@Override
@@ -84,22 +86,29 @@ public class AnswerSessionDialog extends DialogFragment{
         
         skill = (EditText) dialogView.findViewById(R.id.skill_ans_session);
         skill.setText(sessionParse.getString("Skill"));
-        
+                
 		user = (EditText) dialogView.findViewById(R.id.user_ans_session);
 		user.setText(sessionParse.getString("Sender"));
 		
 		hours = (EditText) dialogView.findViewById(R.id.hours_ans_session);
 		hours.setText(sessionParse.getInt("Hours") + "h");
 			
-		feedback = (EditText) dialogView.findViewById(R.id.feedback_ans_session);
-				
+		feedback = (EditText) dialogView.findViewById(R.id.feedback_ans_session);				
 		rating = (RatingBar) dialogView.findViewById(R.id.ratingBar);
+		
+		if(!answerSession){
+			feedback.setEnabled(false);
+			feedback.setText(sessionParse.getString("Feedback"));
+			rating.setEnabled(false);
+			rating.setRating((float) sessionParse.getDouble("Rating"));
+		}
         
-     // Inflate and set the layout for the dialog
+		// Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(inflater.inflate(R.layout.ans_session_dialog, null));
         builder.setView(dialogView);
         
+        if(answerSession)        
         builder.setMessage(R.string.ans_session)
                .setPositiveButton(R.string.approve_session, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
